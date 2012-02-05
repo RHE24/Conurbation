@@ -1,0 +1,10 @@
+name: Conurbation
+main: me.daddychurchill.Conurbation.Conurbation
+version: 0.01
+load: startup
+author: DaddyChurchill
+commands:
+  conurbation:
+    description: Sends you to the Conurbation
+    usage: /conurbation
+    
