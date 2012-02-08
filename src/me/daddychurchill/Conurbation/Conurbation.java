@@ -21,7 +21,6 @@ public class Conurbation extends JavaPlugin{
 	
 	public static final Logger log = Logger.getLogger("Minecraft.CityWorld");
    	
-	private FileConfiguration config;
 	private int streetLevel;
 	private int seabedLevel;
 	public final static int defaultStreetLevel = 40;
@@ -30,13 +29,13 @@ public class Conurbation extends JavaPlugin{
     public Conurbation() {
 		super();
 		
-		setStreetLevel(defaultStreetLevel);
-		setSeabedLevel(defaultSeabedLevel);
+		this.streetLevel = defaultStreetLevel;
+		this.seabedLevel = defaultSeabedLevel;
 	}
 
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator(String name, String style){
-		return new ConurbationChunkGenerator(this, name, style);
+		return new Generator(this, name, style);
 	}
 	
 	@Override
@@ -53,10 +52,10 @@ public class Conurbation extends JavaPlugin{
 		PluginManager pm = getServer().getPluginManager();
 		pm.addPermission(new Permission("conurbation.command", PermissionDefault.OP));
 		
-		addCommand("conurbation", new ConurbationCreateCMD(this));
+		addCommand("conurbation", new CreateCMD(this));
 
 		// add/get the configuration
-		config = getConfig();
+		FileConfiguration config = getConfig();
 		config.options().header("Conurbation Global Options");
 		config.addDefault("Global.StreetLevel", defaultStreetLevel);
 		config.addDefault("Global.SeabedLevel", defaultSeabedLevel);
@@ -64,8 +63,8 @@ public class Conurbation extends JavaPlugin{
 		saveConfig();
 		
 		// now read out the bits for real
-		setStreetLevel(config.getInt("Global.StreetLevel"));
-		setSeabedLevel(config.getInt("Global.SeabedLevel"));
+		streetLevel = validateStreetLevel(config.getInt("Global.StreetLevel"), seabedLevel);
+		seabedLevel = validateSeabedLevel(config.getInt("Global.SeabedLevel"), streetLevel);
 		
 		// configFile can be retrieved via getConfig()
 		log.info(getDescription().getFullName() + " is enabled" );
@@ -95,7 +94,7 @@ public class Conurbation extends JavaPlugin{
 				// if neither then create/build it!
 				WorldCreator creator = new WorldCreator(WORLD_NAME);
 				creator.environment(World.Environment.NORMAL);
-				creator.generator(new ConurbationChunkGenerator(this, WORLD_NAME, ""));
+				creator.generator(new Generator(this, WORLD_NAME, ""));
 				conurbationPrime = Bukkit.getServer().createWorld(creator);
 			}
 		}
@@ -108,16 +107,16 @@ public class Conurbation extends JavaPlugin{
 		return streetLevel;
 	}
 
-	public void setStreetLevel(int aStreetLevel) {
-		streetLevel = Math.max(aStreetLevel, Math.min(ByteChunk.Height - 1, seabedLevel + minimumSeabedStreetLevelDifference));
-	}
-
 	public int getSeabedLevel() {
 		return seabedLevel;
 	}
 
-	public void setSeabedLevel(int aSeabedLevel) {
-		seabedLevel = Math.min(aSeabedLevel, Math.max(1, streetLevel - minimumSeabedStreetLevelDifference));
+	public int validateStreetLevel(int aStreetLevel, int aSeabedLevel) {
+		return Math.max(aStreetLevel, Math.min(ByteChunk.Height - 1, aSeabedLevel + minimumSeabedStreetLevelDifference));
+	}
+
+	public int validateSeabedLevel(int aSeabedLevel, int aStreetLevel) {
+		return Math.min(aSeabedLevel, Math.max(1, aStreetLevel - minimumSeabedStreetLevelDifference));
 	}
 }
 

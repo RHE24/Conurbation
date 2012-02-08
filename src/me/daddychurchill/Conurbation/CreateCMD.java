@@ -6,10 +6,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class ConurbationCreateCMD implements CommandExecutor {
+public class CreateCMD implements CommandExecutor {
     private final Conurbation plugin;
 
-    public ConurbationCreateCMD(Conurbation plugin)
+    public CreateCMD(Conurbation plugin)
     {
         this.plugin = plugin;
     }

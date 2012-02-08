@@ -10,11 +10,11 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 
-public class ConurbationBlockPopulator extends BlockPopulator {
+public class Populator extends BlockPopulator {
 
-	private ConurbationChunkGenerator chunkGen;
+	private Generator chunkGen;
 	
-	public ConurbationBlockPopulator(ConurbationChunkGenerator chunkGen){
+	public Populator(Generator chunkGen){
 		this.chunkGen = chunkGen;
 	}
 	
@@ -27,9 +27,8 @@ public class ConurbationBlockPopulator extends BlockPopulator {
 		RealChunk chunk = new RealChunk(source);
 		
 		// figure out what everything looks like
-		PlatGenerator plat = chunkGen.getPlatGenerator(world, random, chunkX, chunkZ);
-		if (plat != null) {
-			plat.generateBlocks(chunkGen.getWorld(), chunk, chunkX, chunkZ);
-		}
+		PlatGenerator plat = chunkGen.getPlatGenerator(chunkX, chunkZ);
+		if (plat != null)
+			plat.populateChunk(chunk, chunkX, chunkZ);
 	}
 }
