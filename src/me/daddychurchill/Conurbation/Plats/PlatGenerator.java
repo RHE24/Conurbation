@@ -2,19 +2,15 @@ package me.daddychurchill.Conurbation.Plats;
 
 import org.bukkit.Material;
 
-import me.daddychurchill.Conurbation.Conurbation;
-import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
-import me.daddychurchill.Conurbation.Support.NoiseMakers;
+import me.daddychurchill.Conurbation.Support.Generator;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public abstract class PlatGenerator {
 	
-	protected Generator context;
-	protected NoiseMakers noise;
-	public PlatGenerator(Generator context, NoiseMakers noise) {
+	protected Generator noise;
+	public PlatGenerator(Generator noise) {
 		super();
-		this.context = context;
 		this.noise = noise;
 	}
 
@@ -28,4 +24,6 @@ public abstract class PlatGenerator {
 	protected static byte byteStone = (byte) Material.STONE.getId();
 	protected static byte byteDirt = (byte) Material.DIRT.getId();
 	protected static byte byteGrass = (byte) Material.GRASS.getId();
+	protected static byte byteIron = (byte) Material.IRON_BLOCK.getId();
+	protected static byte byteGlass = (byte) Material.GLASS.getId();
 }
