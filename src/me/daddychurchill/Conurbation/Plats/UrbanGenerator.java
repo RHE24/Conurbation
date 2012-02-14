@@ -16,7 +16,7 @@ public class UrbanGenerator extends PlatGenerator {
 		
 		chunk.setLayer(0, byteBedrock);
 		chunk.setBlocks(0, 16, 1, streetLevel + 1, 0, 16, byteStone);
-		chunk.setBlocks(1, 15, streetLevel + 1, streetLevel + 5 * Generator.floorHeight + 1, 1, 15, byteIron);
+		chunk.setBlocks(1, 15, streetLevel + 1, streetLevel + 5 * Generator.floorHeight + 1, 1, 15, byteUrban);
 //		chunk.setBlocks(1, 15, streetLevel + 1, streetLevel + floors * floorHeight + 1, 1, 15, stuff);
 	}
 

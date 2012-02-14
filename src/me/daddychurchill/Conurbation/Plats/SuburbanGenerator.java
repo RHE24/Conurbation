@@ -16,7 +16,7 @@ public class SuburbanGenerator extends PlatGenerator {
 		
 		chunk.setLayer(0, byteBedrock);
 		chunk.setBlocks(0, 16, 1, streetLevel, 0, 16, byteStone);
-		chunk.setBlocks(0, 16, streetLevel, streetLevel + 1, 0, 16, byteGrass);
+		chunk.setBlocks(0, 16, streetLevel, streetLevel + 1, 0, 16, byteSuburban);
 	}
 
 	@Override

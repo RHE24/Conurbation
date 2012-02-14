@@ -17,7 +17,7 @@ public class RuralGenerator extends PlatGenerator {
 		
 		chunk.setLayer(0, byteBedrock);
 		chunk.setBlocks(0, 16, 1, streetLevel, 0, 16, byteStone);
-		chunk.setBlocks(0, 16, streetLevel, streetLevel + 1, 0, 16, byteDirt);
+		chunk.setBlocks(0, 16, streetLevel, streetLevel + 1, 0, 16, byteRural);
 	}
 
 	@Override

@@ -26,4 +26,8 @@ public abstract class PlatGenerator {
 	protected static byte byteGrass = (byte) Material.GRASS.getId();
 	protected static byte byteIron = (byte) Material.IRON_BLOCK.getId();
 	protected static byte byteGlass = (byte) Material.GLASS.getId();
+	
+	protected static byte byteUrban = byteIron;
+	protected static byte byteSuburban = (byte) Material.SANDSTONE.getId();
+	protected static byte byteRural = byteGrass;
 }

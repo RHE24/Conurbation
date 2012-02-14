@@ -30,8 +30,8 @@ public class Generator {
 	private static int roadCellSize = 4;
 	private static double xIntersectionFactor = 6;
 	private static double zIntersectionFactor = 6;
-	private static double threshholdRoad = 0.75;
-	private static double threshholdBridge = 1.20;
+	private static double threshholdRoad = 0.65;
+	private static double threshholdBridge = 1.10;
 	private static double threshholdBridgeLength = 0.10;
 	
 	private static double xHeightFactor = 20.0;
@@ -76,6 +76,7 @@ public class Generator {
 		this.world = world;
 		this.config = config;
 		
+//		long seed = -3529917734078883199L;
 		long seed = this.world.getSeed();
 		noiseUrban = new SimplexNoiseGenerator(seed);
 		noiseRural = new SimplexNoiseGenerator(seed + 1);
@@ -92,6 +93,7 @@ public class Generator {
 		generatorUrban = new UrbanGenerator(this);
 		generatorSuburban = new SuburbanGenerator(this);
 		generatorRural = new RuralGenerator(this);
+		
 //		generatorUnknown = new UnknownGenerator(this);
 	}
 	
@@ -185,16 +187,27 @@ public class Generator {
 		return noiseLevel < threshholdUnfinished;
 	}
 	
+	private boolean checkRoadCoordinate(int i) {
+		return i % roadCellSize == 0;
+	}
+	
+	private int fixRoadCoordinate(int i) {
+		if (i < 0) {
+			return -((Math.abs(i + 1) / roadCellSize) * roadCellSize + roadCellSize);
+		} else
+			return (i / roadCellSize) * roadCellSize;
+	}
+	
 	public boolean isRoad(int x, int z) {
 		
 		// quick test!
-		boolean roadExists = x % roadCellSize == 0 || z % roadCellSize == 0;
+		boolean roadExists = checkRoadCoordinate(x) || checkRoadCoordinate(z);
 		
 		// not so quick test
 		if (roadExists) {
 			
 			// is this an intersection?
-			if (x % roadCellSize == 0 && z % roadCellSize == 0) {
+			if (checkRoadCoordinate(x) && checkRoadCoordinate(z)) {
 				
 				// if roads exists to any of the cardinal directions then we exist
 				roadExists = isRoad(x - 1, z) ||
@@ -210,11 +223,11 @@ public class Generator {
 				double previousNoise, nextNoise, lengthNoise = 0.0;
 				
 				// north/south road?
-				if (x % roadCellSize == 0) {
+				if (checkRoadCoordinate(x)) {
 					
 					// find previous intersection not in water
 					previousX = x;
-					previousZ = (z / roadCellSize) * roadCellSize;
+					previousZ = fixRoadCoordinate(z);
 					while (isWater(previousX, previousZ)) {
 						previousZ -= roadCellSize;
 						isBridge = true;
@@ -229,7 +242,7 @@ public class Generator {
 						
 					// find next intersection not in water
 					nextX = x;
-					nextZ = ((z + roadCellSize) / roadCellSize) * roadCellSize;
+					nextZ = fixRoadCoordinate(z + roadCellSize);
 					while (isWater(nextX, nextZ)) {
 						nextZ += roadCellSize;
 						isBridge = true;
@@ -243,10 +256,10 @@ public class Generator {
 						nextNoise = getIntersectionNoise(nextX, nextZ - 1);
 					
 				// east/west road?
-				} else { // if (z % roadCellSize == 0)
+				} else { // if (checkRoadCoordinate(z))
 	
 					// find previous intersection not in water
-					previousX = (x / roadCellSize) * roadCellSize;
+					previousX = fixRoadCoordinate(x);
 					previousZ = z;
 					while (isWater(previousX, previousZ)) {
 						previousX -= roadCellSize;
@@ -261,7 +274,7 @@ public class Generator {
 						previousNoise = getIntersectionNoise(previousX + 1, previousZ);
 						
 					// find next intersection not in water
-					nextX = ((x + roadCellSize) / roadCellSize) * roadCellSize;
+					nextX = fixRoadCoordinate(x + roadCellSize);
 					nextZ = z;
 					while (isWater(nextX, nextZ)) {
 						nextX += roadCellSize;
