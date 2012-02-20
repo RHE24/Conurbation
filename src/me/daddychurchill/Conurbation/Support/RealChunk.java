@@ -3,6 +3,7 @@ package me.daddychurchill.Conurbation.Support;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CreatureSpawner;
@@ -12,14 +13,14 @@ import org.bukkit.inventory.ItemStack;
 
 public class RealChunk {
 	private Chunk chunk;
-	public final static int Width = 16;
-	public final static int Height = 128;
 
 	public int X;
 	public int Z;
 	private boolean doPhysics;
+	public int Width;
+	public int Height;
 
-	public RealChunk(Chunk chunk) {
+	public RealChunk(World world, Chunk chunk) {
 		super();
 		this.chunk = chunk;
 		this.X = chunk.getX();

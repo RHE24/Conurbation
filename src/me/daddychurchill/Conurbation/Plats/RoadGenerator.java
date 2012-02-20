@@ -1,28 +1,44 @@
 package me.daddychurchill.Conurbation.Plats;
 
-import org.bukkit.Material;
+import java.util.HashSet;
+import java.util.Random;
 
+import org.bukkit.Material;
+import org.bukkit.util.noise.SimplexNoiseGenerator;
+
+import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
-import me.daddychurchill.Conurbation.Support.Generator;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public class RoadGenerator extends PlatGenerator {
 
 	protected final static int sidewalkWidth = 3;
 	
-	protected final static byte pavementId = (byte) Material.STONE.getId();
-	protected final static byte sidewalkId = (byte) Material.STEP.getId();
-	protected final static byte bridgeId = (byte) Material.SMOOTH_BRICK.getId();
-	protected final static byte railingId = (byte) Material.FENCE.getId();
-	protected final static byte railingBaseId = (byte) Material.DOUBLE_STEP.getId();
+	public final static byte bytePavement = (byte) Material.STONE.getId();
+	public final static byte byteSidewalk = (byte) Material.STEP.getId();
+	public final static byte byteBridge = (byte) Material.SMOOTH_BRICK.getId();
+	public final static byte byteRailing = (byte) Material.FENCE.getId();
+	public final static byte byteRailingBase = (byte) Material.DOUBLE_STEP.getId();
+	
+	public final static int roadCellSize = 4;
+	public final static double xIntersectionFactor = 6;
+	public final static double zIntersectionFactor = 6;
+	public final static double threshholdRoad = 0.65;
+	public final static double threshholdBridge = 1.00;
+	public final static double threshholdBridgeLength = 0.10;
+	
+	private SimplexNoiseGenerator noiseIntersection;
+	private HashSet<Long> knownRoads;
 	
 	public RoadGenerator(Generator noise) {
 		super(noise);
-		// TODO Auto-generated constructor stub
+
+		noiseIntersection = new SimplexNoiseGenerator(noise.getNextSeed());
+		knownRoads = new HashSet<Long>();
 	}
 
 	@Override
-	public void generateChunk(ByteChunk chunk, int chunkX, int chunkZ) {
+	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
 		int streetLevel = noise.getStreetLevel();
 		int seabedLevel = noise.getSeabedLevel();
 		int sidewalkLevel = streetLevel + 1;
@@ -34,36 +50,36 @@ public class RoadGenerator extends PlatGenerator {
 		boolean isBridge = noise.isWater(chunkX, chunkZ);
 		
 		// draw pavement
-		chunk.setLayer(streetLevel, pavementId);
+		chunk.setLayer(streetLevel, bytePavement);
 		
 		// sidewalk corners
-		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, sidewalkId);
-		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, ByteChunk.Width - sidewalkWidth, ByteChunk.Width, sidewalkId);
-		chunk.setBlocks(ByteChunk.Width - sidewalkWidth, ByteChunk.Width, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, sidewalkId);
-		chunk.setBlocks(ByteChunk.Width - sidewalkWidth, ByteChunk.Width, sidewalkLevel, sidewalkLevel + 1, ByteChunk.Width - sidewalkWidth, ByteChunk.Width, sidewalkId);
+		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
+		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, chunk.Width - sidewalkWidth, chunk.Width, byteSidewalk);
+		chunk.setBlocks(chunk.Width - sidewalkWidth, chunk.Width, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
+		chunk.setBlocks(chunk.Width - sidewalkWidth, chunk.Width, sidewalkLevel, sidewalkLevel + 1, chunk.Width - sidewalkWidth, chunk.Width, byteSidewalk);
 		
 		// sidewalk edges
 		if (!toWest)
-			chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, ByteChunk.Width - sidewalkWidth, sidewalkId);
+			chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, chunk.Width - sidewalkWidth, byteSidewalk);
 		if (!toEast)
-			chunk.setBlocks(ByteChunk.Width - sidewalkWidth, ByteChunk.Width, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, ByteChunk.Width - sidewalkWidth, sidewalkId);
+			chunk.setBlocks(chunk.Width - sidewalkWidth, chunk.Width, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, chunk.Width - sidewalkWidth, byteSidewalk);
 		if (!toNorth)
-			chunk.setBlocks(sidewalkWidth, ByteChunk.Width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, sidewalkId);
+			chunk.setBlocks(sidewalkWidth, chunk.Width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
 		if (!toSouth)
-			chunk.setBlocks(sidewalkWidth, ByteChunk.Width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, ByteChunk.Width - sidewalkWidth, ByteChunk.Width, sidewalkId);
+			chunk.setBlocks(sidewalkWidth, chunk.Width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, chunk.Width - sidewalkWidth, chunk.Width, byteSidewalk);
 		
 		// round things out
 		if (!toWest && toEast && !toNorth && toSouth)
 			generateRoundedOut(chunk, sidewalkLevel, sidewalkWidth, sidewalkWidth, 
 					false, false);
 		if (!toWest && toEast && toNorth && !toSouth)
-			generateRoundedOut(chunk, sidewalkLevel, sidewalkWidth, ByteChunk.Width - sidewalkWidth - 4, 
+			generateRoundedOut(chunk, sidewalkLevel, sidewalkWidth, chunk.Width - sidewalkWidth - 4, 
 					false, true);
 		if (toWest && !toEast && !toNorth && toSouth)
-			generateRoundedOut(chunk, sidewalkLevel, ByteChunk.Width - sidewalkWidth - 4, sidewalkWidth, 
+			generateRoundedOut(chunk, sidewalkLevel, chunk.Width - sidewalkWidth - 4, sidewalkWidth, 
 					true, false);
 		if (toWest && !toEast && toNorth && !toSouth)
-			generateRoundedOut(chunk, sidewalkLevel, ByteChunk.Width - sidewalkWidth - 4, ByteChunk.Width - sidewalkWidth - 4, 
+			generateRoundedOut(chunk, sidewalkLevel, chunk.Width - sidewalkWidth - 4, chunk.Width - sidewalkWidth - 4, 
 					true, true);
 		
 		//TODO need to create more complex bridge styles
@@ -71,30 +87,30 @@ public class RoadGenerator extends PlatGenerator {
 		if (isBridge) {
 			
 			// thicken it up
-			chunk.setLayer(streetLevel - 1, bridgeId);
+			chunk.setLayer(streetLevel - 1, byteBridge);
 			
 			// support columns
-			chunk.setBlocks(0, 2, seabedLevel, streetLevel - 1, 0, 2, bridgeId);
-			chunk.setBlocks(14, 16, seabedLevel, streetLevel - 1, 0, 2, bridgeId);
-			chunk.setBlocks(0, 2, seabedLevel, streetLevel - 1, 14, 16, bridgeId);
-			chunk.setBlocks(14, 16, seabedLevel, streetLevel - 1, 14, 16, bridgeId);
+			chunk.setBlocks(0, 2, seabedLevel, streetLevel - 1, 0, 2, byteBridge);
+			chunk.setBlocks(14, 16, seabedLevel, streetLevel - 1, 0, 2, byteBridge);
+			chunk.setBlocks(0, 2, seabedLevel, streetLevel - 1, 14, 16, byteBridge);
+			chunk.setBlocks(14, 16, seabedLevel, streetLevel - 1, 14, 16, byteBridge);
 			
 			// railing
 			if (!toNorth) {
-				chunk.setBlocks(0, 16, sidewalkLevel, sidewalkLevel + 1, 0, 1, railingBaseId);
-				chunk.setBlocks(0, 16, sidewalkLevel + 1, sidewalkLevel + 2, 0, 1, railingId);
+				chunk.setBlocks(0, 16, sidewalkLevel, sidewalkLevel + 1, 0, 1, byteRailingBase);
+				chunk.setBlocks(0, 16, sidewalkLevel + 1, sidewalkLevel + 2, 0, 1, byteRailing);
 			} 
 			if (!toSouth) {
-				chunk.setBlocks(0, 16, sidewalkLevel, sidewalkLevel + 1, 15, 16, railingBaseId);
-				chunk.setBlocks(0, 16, sidewalkLevel + 1, sidewalkLevel + 2, 15, 16, railingId);
+				chunk.setBlocks(0, 16, sidewalkLevel, sidewalkLevel + 1, 15, 16, byteRailingBase);
+				chunk.setBlocks(0, 16, sidewalkLevel + 1, sidewalkLevel + 2, 15, 16, byteRailing);
 			}
 			if (!toWest) {
-				chunk.setBlocks(0, 1, sidewalkLevel, sidewalkLevel + 1, 0, 16, railingBaseId);
-				chunk.setBlocks(0, 1, sidewalkLevel + 1, sidewalkLevel + 2, 0, 16, railingId);
+				chunk.setBlocks(0, 1, sidewalkLevel, sidewalkLevel + 1, 0, 16, byteRailingBase);
+				chunk.setBlocks(0, 1, sidewalkLevel + 1, sidewalkLevel + 2, 0, 16, byteRailing);
 			}
 			if (!toEast) {
-				chunk.setBlocks(15, 16, sidewalkLevel, sidewalkLevel + 1, 0, 16, railingBaseId);
-				chunk.setBlocks(15, 16, sidewalkLevel + 1, sidewalkLevel + 2, 0, 16, railingId);
+				chunk.setBlocks(15, 16, sidewalkLevel, sidewalkLevel + 1, 0, 16, byteRailingBase);
+				chunk.setBlocks(15, 16, sidewalkLevel + 1, sidewalkLevel + 2, 0, 16, byteRailing);
 			}
 		}
 	}
@@ -103,21 +119,162 @@ public class RoadGenerator extends PlatGenerator {
 
 		// long bits
 		for (int i = 0; i < 4; i++) {
-			chunk.setBlock(toNorth ? x + 3 : x, sidewalkLevel, z + i, sidewalkId);
-			chunk.setBlock(x + i, sidewalkLevel, toEast ? z + 3 : z, sidewalkId);
+			chunk.setBlock(toNorth ? x + 3 : x, sidewalkLevel, z + i, byteSidewalk);
+			chunk.setBlock(x + i, sidewalkLevel, toEast ? z + 3 : z, byteSidewalk);
 		}
 		
 		// little notch
 		chunk.setBlock(toNorth ? x + 2 : x + 1, 
 					   sidewalkLevel, 
 					   toEast ? z + 2 : z + 1, 
-					   sidewalkId);
+					   byteSidewalk);
 	}
 	
 	@Override
-	public void populateChunk(RealChunk chunk, int chunkX, int chunkZ) {
+	public void populateChunk(RealChunk chunk, Random random, int chunkX, int chunkZ) {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public int getGroundSurfaceY(int chunkX, int chunkZ, int blockX, int blockZ) {
+		return noise.getStreetLevel();
+	}
+
+	@Override
+	public Material getGroundSurfaceMaterial(int chunkX, int chunkZ) {
+		return Material.DOUBLE_STEP;
+	}
+
+	//TODO put in the "cross bridge" test in once the caching works
+	
+	@Override
+	public boolean isChunk(int chunkX, int chunkZ) {
+		
+		// quick test! 
+		boolean checkedX = checkRoadCoordinate(chunkX);
+		boolean checkedZ = checkRoadCoordinate(chunkZ);
+		boolean roadExists = checkedX || checkedZ;
+		
+		// not so quick test to verify it is REALLY a road
+		if (roadExists) {
+			
+			// check the cache, if it exists then assume we have a road
+			Long roadId = getChunkKey(chunkX, chunkZ);
+			if (!knownRoads.contains(roadId)) {
+				
+				// is this an intersection?
+				if (checkedX && checkedZ) {
+					
+					// if roads exists to any of the cardinal directions then we exist
+					roadExists = isChunk(chunkX - 1, chunkZ) || isChunk(chunkX + 1, chunkZ) ||
+								 isChunk(chunkX, chunkZ - 1) || isChunk(chunkX, chunkZ + 1);
+					
+				} else {
+
+					// bridge?
+					boolean isBridge = false;
+					int previousX, previousZ, nextX, nextZ;
+					double previousNoise, nextNoise, lengthNoise = 0.0;
+					
+					// north/south road?
+					if (checkedX) {
+						
+						// find previous intersection not in water
+						previousX = chunkX;
+						previousZ = fixRoadCoordinate(chunkZ);
+						while (noise.isWater(previousX, previousZ)) {
+							previousZ -= roadCellSize;
+							isBridge = true;
+							lengthNoise = lengthNoise + threshholdBridgeLength;
+						}
+						
+						// test for northward road
+						if (noise.isWater(previousX, previousZ + 1))
+							previousNoise = 0.0;
+						else
+							previousNoise = getIntersectionNoise(previousX, previousZ + 1);
+							
+						// find next intersection not in water
+						nextX = chunkX;
+						nextZ = fixRoadCoordinate(chunkZ + roadCellSize);
+						while (noise.isWater(nextX, nextZ)) {
+							nextZ += roadCellSize;
+							isBridge = true;
+							lengthNoise = lengthNoise + threshholdBridgeLength;
+						}
+						
+						// test for southward road
+						if (noise.isWater(nextX, nextZ - 1))
+							nextNoise = 0.0;
+						else
+							nextNoise = getIntersectionNoise(nextX, nextZ - 1);
+						
+					// east/west road?
+					} else { // if (checkRoadCoordinate(chunkZ))
+		
+						// find previous intersection not in water
+						previousX = fixRoadCoordinate(chunkX);
+						previousZ = chunkZ;
+						while (noise.isWater(previousX, previousZ)) {
+							previousX -= roadCellSize;
+							isBridge = true;
+							lengthNoise = lengthNoise + threshholdBridgeLength;
+						}
+						
+						// test for westward road
+						if (noise.isWater(previousX + 1, previousZ))
+							previousNoise = 0.0;
+						else
+							previousNoise = getIntersectionNoise(previousX + 1, previousZ);
+							
+						// find next intersection not in water
+						nextX = fixRoadCoordinate(chunkX + roadCellSize);
+						nextZ = chunkZ;
+						while (noise.isWater(nextX, nextZ)) {
+							nextX += roadCellSize;
+							isBridge = true;
+							lengthNoise = lengthNoise + threshholdBridgeLength;
+						}
+						
+						// test for eastward road
+						if (noise.isWater(nextX - 1, nextZ))
+							nextNoise = 0.0;
+						else
+							nextNoise = getIntersectionNoise(nextX - 1, nextZ);
+					}
+					
+					// overwater?
+					if (isBridge)
+						roadExists = (previousNoise + nextNoise) > (threshholdBridge + lengthNoise); // longer bridges are "harder"
+					else
+						roadExists = (previousNoise + nextNoise) > threshholdRoad;
+				}
+				
+				// if we found one, remember it for next time
+				if (roadExists)
+					knownRoads.add(roadId);
+			}
+		}
+		
+		// tell the world
+		return roadExists;
+	}
+
+	private double getIntersectionNoise(int x, int z) {
+		return (noiseIntersection.noise(x / xIntersectionFactor, z / zIntersectionFactor) + 1) / 2;
+	}
+	
+	private boolean checkRoadCoordinate(int i) {
+		return i % roadCellSize == 0;
+	}
+	
+	private int fixRoadCoordinate(int i) {
+		if (i < 0) {
+			return -((Math.abs(i + 1) / roadCellSize) * roadCellSize + roadCellSize);
+		} else
+			return (i / roadCellSize) * roadCellSize;
+	}
+	
 
 }

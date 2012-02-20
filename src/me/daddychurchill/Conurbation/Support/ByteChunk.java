@@ -3,20 +3,23 @@ package me.daddychurchill.Conurbation.Support;
 import java.util.Arrays;
 
 import org.bukkit.Material;
+import org.bukkit.World;
 
 public class ByteChunk {
-	public final static int Width = 16;
-	public final static int Height = 128;
 	
-	public int X;
-	public int Z;
+	public int chunkX;
+	public int chunkZ;
 	public byte[] blocks;
+	public int Width;
+	public int Height;
 		
-	public ByteChunk (int chunkX, int chunkZ) {
+	public ByteChunk (World world, int chunkX, int chunkZ) {
 		super();
-		X = chunkX;
-		Z = chunkZ;
-		blocks = new byte[Width * Width * Height];
+		this.chunkX = chunkX;
+		this.chunkZ = chunkZ;
+		this.Width = 16;
+		this.Height = world.getMaxHeight();
+		this.blocks = new byte[Width * Width * Height];
 	}
 	
 	public void setBlock(int x, int y, int z, byte materialId) {

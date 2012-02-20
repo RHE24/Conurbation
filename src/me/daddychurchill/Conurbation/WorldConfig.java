@@ -1,6 +1,5 @@
 package me.daddychurchill.Conurbation;
 
-import me.daddychurchill.Conurbation.Support.ByteChunk;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class WorldConfig {
@@ -12,10 +11,8 @@ public class WorldConfig {
 	private int streetLevel;
 	private int seabedLevel;
 	
-	private static int globalStreetLevel;
-	private static int globalSeabedLevel;
-	public final static int defaultStreetLevel = 40;
-	public final static int defaultSeabedLevel = 20;
+	public final static int defaultStreetLevel = -1;
+	public final static int defaultSeabedLevel = -1;
 	
 	public WorldConfig(Conurbation plugin, String name, String style) {
 		super();
@@ -23,6 +20,10 @@ public class WorldConfig {
 		this.plugin = plugin;
 		this.worldname = name;
 		this.worldstyle = style;
+		
+		// remember the globals
+		int globalStreetLevel = defaultStreetLevel;
+		int globalSeabedLevel = defaultSeabedLevel;
 		
 		// global read yet?
 		if (config == null) {
@@ -34,8 +35,8 @@ public class WorldConfig {
 			plugin.saveConfig();
 			
 			// now read out the bits for real
-			globalStreetLevel = validateStreetLevel(config.getInt("Global.StreetLevel"), globalSeabedLevel);
-			globalSeabedLevel = validateSeabedLevel(config.getInt("Global.SeabedLevel"), globalStreetLevel);
+			globalStreetLevel = config.getInt("Global.StreetLevel");
+			globalSeabedLevel = config.getInt("Global.SeabedLevel");
 		}
 		
 		// copy over the defaults
@@ -43,8 +44,8 @@ public class WorldConfig {
 		seabedLevel = globalSeabedLevel;
 		
 		// grab the world specific values
-		streetLevel = validateStreetLevel(getWorldInt(config, "StreetLevel", globalStreetLevel), seabedLevel);
-		seabedLevel = validateSeabedLevel(getWorldInt(config, "SeabedLevel", globalSeabedLevel), streetLevel);
+		streetLevel = getWorldInt(config, "StreetLevel", globalStreetLevel);
+		seabedLevel = getWorldInt(config, "SeabedLevel", globalSeabedLevel);
 	}
 
 	private int getWorldInt(FileConfiguration config, String option, int global) {
@@ -75,21 +76,4 @@ public class WorldConfig {
 		return seabedLevel;
 	}
 	
-	private final static int minimumSeabedStreetLevelDifference = 10;
-	
-	public int getGlobalStreetLevel() {
-		return globalStreetLevel;
-	}
-
-	public int getGlobalSeabedLevel() {
-		return globalSeabedLevel;
-	}
-
-	private int validateStreetLevel(int aStreetLevel, int aSeabedLevel) {
-		return Math.max(aStreetLevel, Math.min(ByteChunk.Height - 1, aSeabedLevel + minimumSeabedStreetLevelDifference));
-	}
-
-	private int validateSeabedLevel(int aSeabedLevel, int aStreetLevel) {
-		return Math.min(aSeabedLevel, Math.max(1, aStreetLevel - minimumSeabedStreetLevelDifference));
-	}
 }

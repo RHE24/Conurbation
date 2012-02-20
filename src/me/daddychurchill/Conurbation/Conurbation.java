@@ -37,32 +37,8 @@ public class Conurbation extends JavaPlugin{
 		log.info(getDescription().getFullName() + " has been disabled" );
 	}
 	
-//	int roadCellSize = 3;
-//	private boolean checkRoadCoordinate(int i) {
-//		return i % roadCellSize == 0;
-//	}
-//	
-//	private int fixRoadCoordinate(int i) {
-//		if (i < 0) {
-//			return -((Math.abs(i + 1) / roadCellSize) * roadCellSize + roadCellSize);
-//		} else
-//			return (i / roadCellSize) * roadCellSize;
-//	}
-
 	@Override
 	public void onEnable() {
-		
-//		for (int i = -10; i < 10; i++)
-//			Conurbation.log.info("1: i = " + i + " % " + roadCellSize + " = " + (i % roadCellSize));
-//		for (int i = -10; i < 10; i++)
-//			Conurbation.log.info("2: i = " + i + " = " + fixRoadCoordinate(i) + " <--> " + fixRoadCoordinate (i + roadCellSize));
-//		for (int i = -10; i < 10; i++) {
-//			int previousI = fixRoadCoordinate(i);
-//			previousI -= roadCellSize;
-//			int nextI = fixRoadCoordinate (i + roadCellSize);
-//			nextI += roadCellSize;
-//			Conurbation.log.info("3: i = " + i + " = " + previousI + " <--> " + nextI);
-//		}
 		
 		// figure out permissions and associated commands
 		PluginManager pm = getServer().getPluginManager();
@@ -84,7 +60,7 @@ public class Conurbation extends JavaPlugin{
 	
     // prime world support (loosely based on ExpansiveTerrain)
 	public final static String WORLD_NAME = "Conurbation";
-	private static World conurbationPrime = null;
+	private World conurbationPrime = null;
 	public World getConurbation() {
 		
 		// created yet?

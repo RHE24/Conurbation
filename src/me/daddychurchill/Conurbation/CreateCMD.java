@@ -18,14 +18,14 @@ public class CreateCMD implements CommandExecutor {
     {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			if (player.hasPermission("conurbation.command")) {
+//			if (player.hasPermission("conurbation.command")) {
 				player.sendMessage("Loading/creating conurbation... This might take a moment...");
 				player.teleport(plugin.getConurbation().getSpawnLocation());
 				return true;
-			} else {
-				sender.sendMessage("You do not have permission to use this command");
-				return false;
-			}
+//			} else {
+//				sender.sendMessage("You do not have permission to use this command");
+//				return false;
+//			}
 		} else {
 			sender.sendMessage("This command is only usable by a player");
 			return false;

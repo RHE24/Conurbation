@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import me.daddychurchill.Conurbation.Support.ByteChunk;
-import me.daddychurchill.Conurbation.Support.Generator;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 import org.bukkit.Chunk;
@@ -50,10 +49,10 @@ public class ChunkCallback extends ChunkGenerator {
 			generators = new Generator(world, config);
 		
 		// place to work
-		ByteChunk byteChunk = new ByteChunk(chunkX, chunkZ);
+		ByteChunk byteChunk = new ByteChunk(world, chunkX, chunkZ);
 		
 		// figure out what everything looks like
-		generators.Generate(byteChunk, random, chunkX, chunkZ);
+		generators.generate(byteChunk, random, chunkX, chunkZ);
 		 
 		// let minecraft/bukkit do it's thing
 		return byteChunk.blocks;
@@ -70,9 +69,9 @@ public class ChunkCallback extends ChunkGenerator {
 		int chunkZ = source.getZ();
 		
 		// place to work
-		RealChunk realChunk = new RealChunk(source);
+		RealChunk realChunk = new RealChunk(world, source);
 		
 		// figure out what everything looks like
-		generators.Populate(realChunk, random, chunkX, chunkZ);
+		generators.populate(realChunk, random, chunkX, chunkZ);
 	}
 }

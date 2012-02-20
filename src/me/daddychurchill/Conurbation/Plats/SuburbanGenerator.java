@@ -1,28 +1,53 @@
 package me.daddychurchill.Conurbation.Plats;
 
+import java.util.Random;
+
+import org.bukkit.Material;
+
+import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
-import me.daddychurchill.Conurbation.Support.Generator;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public class SuburbanGenerator extends PlatGenerator {
 
+	public final static byte byteGround = (byte) Material.SANDSTONE.getId();
+	int groundLevel;
+	
 	public SuburbanGenerator(Generator noise) {
 		super(noise);
+
+		groundLevel = noise.getStreetLevel();
 	}
 
 	@Override
-	public void generateChunk(ByteChunk chunk, int chunkX, int chunkZ) {
-		int streetLevel = noise.getStreetLevel();
+	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
+		int groundLevel = noise.getStreetLevel();
 		
 		chunk.setLayer(0, byteBedrock);
-		chunk.setBlocks(0, 16, 1, streetLevel, 0, 16, byteStone);
-		chunk.setBlocks(0, 16, streetLevel, streetLevel + 1, 0, 16, byteSuburban);
+		chunk.setBlocks(0, 16, 1, groundLevel, 0, 16, byteStone);
+		chunk.setBlocks(0, 16, groundLevel, groundLevel + 1, 0, 16, byteGround);
 	}
 
 	@Override
-	public void populateChunk(RealChunk chunk, int chunkX, int chunkZ) {
+	public void populateChunk(RealChunk chunk, Random random, int chunkX, int chunkZ) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public int getGroundSurfaceY(int chunkX, int chunkZ, int blockX, int blockZ) {
+		// TODO Auto-generated method stub
+		return groundLevel;
+	}
+
+	@Override
+	public Material getGroundSurfaceMaterial(int chunkX, int chunkZ) {
+		return Material.SANDSTONE;
+	}
+
+	@Override
+	public boolean isChunk(int chunkX, int chunkZ) {
+		return !noise.isUrban(chunkX, chunkZ) && !noise.isRural(chunkX, chunkZ);
 	}
 
 }
