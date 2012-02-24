@@ -17,7 +17,7 @@ public class RealChunk {
 	public int X;
 	public int Z;
 	private boolean doPhysics;
-	public int Width;
+	public int Width = 16;
 	public int Height;
 
 	public RealChunk(World world, Chunk chunk) {
@@ -26,6 +26,7 @@ public class RealChunk {
 		this.X = chunk.getX();
 		this.Z = chunk.getZ();
 		this.doPhysics = false;
+		Height = world.getMaxHeight();
 	}
 	
 	public boolean getDoPhysics() {

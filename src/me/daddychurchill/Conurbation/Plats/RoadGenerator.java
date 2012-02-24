@@ -6,13 +6,16 @@ import java.util.Random;
 import org.bukkit.Material;
 import org.bukkit.util.noise.SimplexNoiseGenerator;
 
+import me.daddychurchill.Conurbation.Conurbation;
 import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public class RoadGenerator extends PlatGenerator {
 
-	protected final static int sidewalkWidth = 3;
+	public final static int sidewalkWidth = 3;
+	public final static int roadThickness = 2;
+	public final static int lightpostHeight = 3;
 	
 	public final static byte bytePavement = (byte) Material.STONE.getId();
 	public final static byte byteSidewalk = (byte) Material.STEP.getId();
@@ -20,12 +23,20 @@ public class RoadGenerator extends PlatGenerator {
 	public final static byte byteRailing = (byte) Material.FENCE.getId();
 	public final static byte byteRailingBase = (byte) Material.DOUBLE_STEP.getId();
 	
+	public final static Material lightpostbaseMaterial = Material.DOUBLE_STEP;
+	public final static Material lightpostMaterial = Material.FENCE;
+	public final static Material lightMaterial = Material.GLOWSTONE;
+	
 	public final static int roadCellSize = 4;
-	public final static double xIntersectionFactor = 6;
-	public final static double zIntersectionFactor = 6;
-	public final static double threshholdRoad = 0.65;
-	public final static double threshholdBridge = 1.00;
-	public final static double threshholdBridgeLength = 0.10;
+	private final static double xIntersectionFactor = 6;
+	private final static double zIntersectionFactor = 6;
+	private final static double threshholdRoad = 0.65;
+	private final static double threshholdBridge = 1.00;
+	private final static double threshholdBridgeLength = 0.10;
+	
+	int streetLevel;
+	int seabedLevel;
+	int sidewalkLevel;
 	
 	private SimplexNoiseGenerator noiseIntersection;
 	private HashSet<Long> knownRoads;
@@ -35,14 +46,16 @@ public class RoadGenerator extends PlatGenerator {
 
 		noiseIntersection = new SimplexNoiseGenerator(noise.getNextSeed());
 		knownRoads = new HashSet<Long>();
+		
+		streetLevel = noise.getStreetLevel();
+		seabedLevel = noise.getSeabedLevel();
+		sidewalkLevel = streetLevel + 1;
 	}
 
 	@Override
 	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
-		int streetLevel = noise.getStreetLevel();
-		int seabedLevel = noise.getSeabedLevel();
-		int sidewalkLevel = streetLevel + 1;
 		
+		// what is where?
 		boolean toNorth = noise.isRoad(chunkX, chunkZ - 1);
 		boolean toSouth = noise.isRoad(chunkX, chunkZ + 1);
 		boolean toWest = noise.isRoad(chunkX - 1, chunkZ);
@@ -115,6 +128,14 @@ public class RoadGenerator extends PlatGenerator {
 		}
 	}
 
+	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		chunk.setBlock(blockX, streetLevel, blockZ, bytePavement);
+		
+		//TODO all of the extra bits are missing!!!
+		return streetLevel - 1;
+	}
+
 	protected void generateRoundedOut(ByteChunk chunk, int sidewalkLevel, int x, int z, boolean toNorth, boolean toEast) {
 
 		// long bits
@@ -132,13 +153,22 @@ public class RoadGenerator extends PlatGenerator {
 	
 	@Override
 	public void populateChunk(RealChunk chunk, Random random, int chunkX, int chunkZ) {
-		// TODO Auto-generated method stub
 
+		// light posts
+		generateLightPost(chunk, sidewalkWidth - 1, sidewalkWidth - 1);
+		generateLightPost(chunk, chunk.Width - sidewalkWidth, chunk.Width - sidewalkWidth);
 	}
 
+	protected void generateLightPost(RealChunk chunk, int x, int z) {
+		int sidewalkLevel = streetLevel + 1;
+		chunk.setBlock(x, sidewalkLevel, z, lightpostbaseMaterial);
+		chunk.setBlocks(x, sidewalkLevel + 1, sidewalkLevel + lightpostHeight + 1, z, lightpostMaterial);
+		chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, lightMaterial, true);
+	}
+	
 	@Override
 	public int getGroundSurfaceY(int chunkX, int chunkZ, int blockX, int blockZ) {
-		return noise.getStreetLevel();
+		return sidewalkLevel;
 	}
 
 	@Override
@@ -147,6 +177,8 @@ public class RoadGenerator extends PlatGenerator {
 	}
 
 	//TODO put in the "cross bridge" test in once the caching works
+	private int lookupTotal = 0;
+	private int lookupSlow = 0;
 	
 	@Override
 	public boolean isChunk(int chunkX, int chunkZ) {
@@ -160,8 +192,10 @@ public class RoadGenerator extends PlatGenerator {
 		if (roadExists) {
 			
 			// check the cache, if it exists then assume we have a road
+			lookupTotal++;
 			Long roadId = getChunkKey(chunkX, chunkZ);
 			if (!knownRoads.contains(roadId)) {
+				lookupSlow++;
 				
 				// is this an intersection?
 				if (checkedX && checkedZ) {
@@ -254,6 +288,10 @@ public class RoadGenerator extends PlatGenerator {
 				// if we found one, remember it for next time
 				if (roadExists)
 					knownRoads.add(roadId);
+			}
+
+			if (lookupTotal % 200 == 0) {
+				Conurbation.log.info("Road cache miss ratio: " + lookupSlow + "/" + lookupTotal);
 			}
 		}
 		

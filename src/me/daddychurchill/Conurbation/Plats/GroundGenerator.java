@@ -10,18 +10,27 @@ import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public class GroundGenerator extends PlatGenerator {
 
+	private int streetLevel;
+	
 	public GroundGenerator(Generator noise) {
 		super(noise);
-		// TODO Auto-generated constructor stub
+
+		streetLevel = noise.getStreetLevel();
 	}
 
 	@Override
 	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
-		int streetLevel = noise.getStreetLevel();
 		
 		chunk.setLayer(0, byteBedrock);
 		chunk.setBlocks(0, 16, 1, streetLevel - 4, 0, 16, byteStone);
 		chunk.setBlocks(0, 16, streetLevel - 4, streetLevel, 0, 16, byteDirt);
+	}
+
+	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		chunk.setBlocks(blockX, 1, streetLevel - 4, blockZ, byteStone);
+		chunk.setBlocks(blockX, streetLevel - 4, streetLevel, blockZ, byteDirt);
+		return streetLevel - 1;
 	}
 
 	@Override

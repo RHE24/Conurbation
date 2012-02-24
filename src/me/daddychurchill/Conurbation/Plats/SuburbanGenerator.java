@@ -21,11 +21,13 @@ public class SuburbanGenerator extends PlatGenerator {
 
 	@Override
 	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
-		int groundLevel = noise.getStreetLevel();
-		
-		chunk.setLayer(0, byteBedrock);
-		chunk.setBlocks(0, 16, 1, groundLevel, 0, 16, byteStone);
 		chunk.setBlocks(0, 16, groundLevel, groundLevel + 1, 0, 16, byteGround);
+	}
+
+	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		chunk.setBlock(blockX, groundLevel, blockZ, byteGround);
+		return groundLevel;
 	}
 
 	@Override

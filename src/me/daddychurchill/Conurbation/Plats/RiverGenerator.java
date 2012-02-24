@@ -53,6 +53,15 @@ public class RiverGenerator extends WaterGenerator {
 	}
 	
 	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		int blockY = noise.isDelta(chunkX, chunkZ) ? getDeltaGroundSurfaceY(chunkX, chunkZ, blockX, blockZ) : getGroundSurfaceY(chunkX, chunkZ, blockX, blockZ);
+		
+		//TODO this is missing all the fancy bits!
+		
+		return generateChunkColumn(chunk, chunkX, chunkZ, blockX, blockZ, blockY);
+	}
+
+	@Override
 	public void populateChunk(RealChunk chunk, Random random, int chunkX, int chunkZ) {
 		// TODO Auto-generated method stub
 

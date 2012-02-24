@@ -41,8 +41,6 @@ public class UrbanGenerator extends PlatGenerator {
 
 	@Override
 	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
-		chunk.setLayer(0, byteBedrock);
-		chunk.setBlocks(0, 16, 1, firstFloorY, 0, 16, byteStone);
 		chunk.setLayer(firstFloorY, RoadGenerator.byteSidewalk);
 		
 		int floors = getUrbanHeight(chunkX, chunkZ);
@@ -54,6 +52,12 @@ public class UrbanGenerator extends PlatGenerator {
 			chunk.setBlocks(1, 15, firstFloorY + y, firstFloorY + y + 1, 1, 15, floorMaterial);
 			chunk.setBlocks(1, 15, firstFloorY + y + 1, firstFloorY + y + Generator.floorHeight, 1, 15, wallMaterial);
 		}
+	}
+
+	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		chunk.setBlock(blockX, firstFloorY, blockZ, RoadGenerator.byteSidewalk);
+		return firstFloorY;
 	}
 
 	@Override
@@ -87,6 +91,17 @@ public class UrbanGenerator extends PlatGenerator {
 	//TODO change this to an enum
 	private final static int featureWallMaterial = 0;
 	private final static int featureFloorMaterial = 1;
+	// connected buildings
+	// wall material 
+	// window material
+	// floor material
+	// roof treatment
+	// room layout
+	// furniture treatment
+	// crop material
+	//TODO Unfinished building (wall and floor material?)
+	//TODO Inset Walls NS/EW
+	//TODO Inset Floors NS/EW
 	
 	private byte getWallMaterial(int chunkX, int chunkZ) {
 		switch(randomFeatureAt(chunkX, chunkZ, featureWallMaterial, 5)) {
@@ -115,10 +130,6 @@ public class UrbanGenerator extends PlatGenerator {
 			return (byte) Material.SMOOTH_BRICK.getId();
 		}
 	}
-	
-	//TODO Unfinished building (wall and floor material?)
-	//TODO Inset Walls NS/EW
-	//TODO Inset Floors NS/EW
 	
 	public int randomFeatureAt(int chunkX, int chunkZ, int slot, int range) {
 		return NoiseGenerator.floor((noiseFeature.noise(chunkX / xMaterialFactor, slot, chunkZ / zMaterialFactor) + 1) / 2 * range);

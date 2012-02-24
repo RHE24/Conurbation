@@ -38,11 +38,18 @@ public class LakeGenerator extends WaterGenerator {
 		
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				//Conurbation.log.info("X, Z = " + x + ", " + z + " Y = " + y + " waterLevel = " + waterLevel);
 				generateChunkColumn(chunk, chunkX, chunkZ, x, z, getGroundSurfaceY(chunkX, chunkZ, x, z));
 			}
 		}
 		generateSeawalls(chunk, chunkX, chunkZ);
+	}
+
+	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		
+		//TODO this is missing all the fancy bits!
+		
+		return generateChunkColumn(chunk, chunkX, chunkZ, blockX, blockZ, getGroundSurfaceY(chunkX, chunkZ, blockX, blockZ));
 	}
 
 	@Override

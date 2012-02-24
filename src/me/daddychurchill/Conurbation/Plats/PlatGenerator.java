@@ -17,11 +17,17 @@ public abstract class PlatGenerator {
 	}
 
 	// what you need to do
+	public abstract boolean isChunk(int chunkX, int chunkZ);
 	public abstract void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ);
 	public abstract void populateChunk(RealChunk chunk, Random random, int chunkX, int chunkZ);
+	public abstract int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ);
 	public abstract int getGroundSurfaceY(int chunkX, int chunkZ, int blockX, int blockZ);
 	public abstract Material getGroundSurfaceMaterial(int chunkX, int chunkZ);
-	public abstract boolean isChunk(int chunkX, int chunkZ);
+	
+	// what you may want to override
+	public boolean isCompatibleEdgeChunk(PlatGenerator generator) {
+		return generator == this;
+	}
 	
 	// some reasonable globals
 	protected final static byte byteBedrock = (byte) Material.BEDROCK.getId();

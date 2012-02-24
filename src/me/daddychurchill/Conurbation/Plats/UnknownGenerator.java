@@ -4,28 +4,31 @@ import java.util.Random;
 
 import org.bukkit.Material;
 
-import me.daddychurchill.Conurbation.Conurbation;
 import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public class UnknownGenerator extends PlatGenerator {
 
-	private int streetLevel;
-	
+	private int skyLevel;
+
 	public UnknownGenerator(Generator noise) {
 		super(noise);
 
-		streetLevel = noise.getStreetLevel();
+		skyLevel = noise.getMaximumLevel();
 	}
 
 	@Override
 	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
 		
-		chunk.setLayer(0, byteBedrock);
-		chunk.setBlocks(0, 16, 1, streetLevel, 0, 16, byteStone);
-		chunk.setBlocks(0, 16, streetLevel, streetLevel + 1, 0, 16, byteGlass);
-		Conurbation.log.info("### UNKNOWN @ " + chunkX + ", " + chunkZ);
+		chunk.setBlocks(0, 16, skyLevel, skyLevel + 1, 0, 16, byteGlass);
+//		Conurbation.log.info("### UNKNOWN @ " + chunkX + ", " + chunkZ);
+	}
+
+	@Override
+	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
+		chunk.setBlock(blockX, skyLevel, blockZ, byteGlass);
+		return skyLevel;
 	}
 
 	@Override
@@ -36,7 +39,7 @@ public class UnknownGenerator extends PlatGenerator {
 
 	@Override
 	public int getGroundSurfaceY(int chunkX, int chunkZ, int blockX, int blockZ) {
-		return streetLevel;
+		return skyLevel;
 	}
 
 	@Override
