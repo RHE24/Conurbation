@@ -19,13 +19,20 @@ public class RoadGenerator extends PlatGenerator {
 	
 	public final static byte bytePavement = (byte) Material.STONE.getId();
 	public final static byte byteSidewalk = (byte) Material.STEP.getId();
+	public final static byte bytePlatwalk = (byte) Material.DOUBLE_STEP.getId(); // good for sidewalks in plats
 	public final static byte byteBridge = (byte) Material.SMOOTH_BRICK.getId();
 	public final static byte byteRailing = (byte) Material.FENCE.getId();
-	public final static byte byteRailingBase = (byte) Material.DOUBLE_STEP.getId();
+	public final static byte byteRailingBase = bytePlatwalk;
 	
 	public final static Material lightpostbaseMaterial = Material.DOUBLE_STEP;
 	public final static Material lightpostMaterial = Material.FENCE;
-	public final static Material lightMaterial = Material.GLOWSTONE;
+	public final static Material workingLampMaterial = Material.GLOWSTONE;
+	public final static Material workingTorchMaterial = Material.TORCH;
+	public final static Material brokeLampMaterial = Material.GLASS;
+	public final static Material brokeTorchMaterial = Material.REDSTONE_TORCH_OFF;
+	
+	private double brokenLampOdds = 0.2;
+	private double brokenTorchOdds = 0.4;
 	
 	public final static int roadCellSize = 4;
 	private final static double xIntersectionFactor = 6;
@@ -155,15 +162,26 @@ public class RoadGenerator extends PlatGenerator {
 	public void populateChunk(RealChunk chunk, Random random, int chunkX, int chunkZ) {
 
 		// light posts
-		generateLightPost(chunk, sidewalkWidth - 1, sidewalkWidth - 1);
-		generateLightPost(chunk, chunk.Width - sidewalkWidth, chunk.Width - sidewalkWidth);
+		boolean isTorch = noise.isRural(chunkX, chunkZ);
+		generateLightPost(chunk, sidewalkWidth - 1, sidewalkWidth - 1, isTorch, random.nextDouble());
+		generateLightPost(chunk, chunk.Width - sidewalkWidth, chunk.Width - sidewalkWidth, isTorch, random.nextDouble());
 	}
 
-	protected void generateLightPost(RealChunk chunk, int x, int z) {
+	protected void generateLightPost(RealChunk chunk, int x, int z, boolean isTorch, double chanceBroken) {
 		int sidewalkLevel = streetLevel + 1;
 		chunk.setBlock(x, sidewalkLevel, z, lightpostbaseMaterial);
 		chunk.setBlocks(x, sidewalkLevel + 1, sidewalkLevel + lightpostHeight + 1, z, lightpostMaterial);
-		chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, lightMaterial, true);
+		if (isTorch) {
+			if (chanceBroken < brokenTorchOdds)
+				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, brokeTorchMaterial.getId(), (byte)5, false);
+			else
+				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, workingTorchMaterial.getId(), (byte)5, true);
+		} else {
+			if (chanceBroken < brokenLampOdds)
+				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, brokeLampMaterial, false);
+			else
+				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, workingLampMaterial, true);
+		}
 	}
 	
 	@Override

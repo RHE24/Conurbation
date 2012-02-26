@@ -3,21 +3,25 @@ package me.daddychurchill.Conurbation;
 import java.util.Random;
 
 import me.daddychurchill.Conurbation.Plats.AirGenerator;
+import me.daddychurchill.Conurbation.Plats.EstateGenerator;
+import me.daddychurchill.Conurbation.Plats.FarmGenerator;
 import me.daddychurchill.Conurbation.Plats.GroundGenerator;
 import me.daddychurchill.Conurbation.Plats.LakeGenerator;
+import me.daddychurchill.Conurbation.Plats.ParkGenerator;
 import me.daddychurchill.Conurbation.Plats.PlatGenerator;
 import me.daddychurchill.Conurbation.Plats.RiverGenerator;
 import me.daddychurchill.Conurbation.Plats.RoadGenerator;
-import me.daddychurchill.Conurbation.Plats.RuralGenerator;
-import me.daddychurchill.Conurbation.Plats.SuburbanGenerator;
+import me.daddychurchill.Conurbation.Plats.ForestGenerator;
+import me.daddychurchill.Conurbation.Plats.NeighborhoodGenerator;
 import me.daddychurchill.Conurbation.Plats.UnknownGenerator;
-import me.daddychurchill.Conurbation.Plats.UrbanGenerator;
+import me.daddychurchill.Conurbation.Plats.CityGenerator;
 import me.daddychurchill.Conurbation.Plats.WaterGenerator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.util.noise.SimplexNoiseGenerator;
 
 public class Generator {
 	private World world;
@@ -31,12 +35,26 @@ public class Generator {
 	public PlatGenerator generatorLake;
 	public PlatGenerator generatorRiver;
 	public PlatGenerator generatorGround;
-	public PlatGenerator generatorRural;
-	public PlatGenerator generatorSuburban;
-	public PlatGenerator generatorUrban;
+	public PlatGenerator generatorParks;
+	public PlatGenerator generatorEstates;
+	public PlatGenerator generatorForests;
+	public PlatGenerator generatorCities;
+	public PlatGenerator generatorNeighborhoods;
+	public PlatGenerator generatorFarms;
 	public PlatGenerator generatorRoad;
 	public PlatGenerator generatorAir;
 	public PlatGenerator generatorUnknown;
+	
+	private final static double xUrbanizationFactor = 30.0;
+	private final static double zUrbanizationFactor = 30.0;
+	private final static double threshholdUrban = 0.60;
+	private final static double threshholdSuburban = 0.35;
+	private final static double xGreenBeltFactor = 30.0;
+	private final static double zGreenBeltFactor = 30.0;
+	private final static double threshholdGreenBeltMin = 0.40;
+	private final static double threshholdGreenBeltMax = 0.50;
+	private SimplexNoiseGenerator noiseUrbanization;
+	private SimplexNoiseGenerator noiseGreenBelt;
 	
 	private int maximumLevel;
 	private int streetLevel;
@@ -50,6 +68,9 @@ public class Generator {
 		super();
 		this.world = world;
 		this.config = config;
+		
+		noiseUrbanization = new SimplexNoiseGenerator(getNextSeed());
+		noiseGreenBelt = new SimplexNoiseGenerator(getNextSeed());
 		
 		maximumLevel = world.getMaxHeight();
 		streetLevel = this.config.getStreetLevel();
@@ -65,10 +86,13 @@ public class Generator {
 		generatorLake = new LakeGenerator(this);
 		generatorRiver = new RiverGenerator(this, generatorLake);
 		generatorGround = new GroundGenerator(this);
+		generatorParks = new ParkGenerator(this);
+		generatorEstates = new EstateGenerator(this);
+		generatorForests = new ForestGenerator(this);
+		generatorCities = new CityGenerator(this);
+		generatorNeighborhoods = new NeighborhoodGenerator(this);
+		generatorFarms = new FarmGenerator(this);
 		generatorRoad = new RoadGenerator(this);
-		generatorUrban = new UrbanGenerator(this);
-		generatorSuburban = new SuburbanGenerator(this);
-		generatorRural = new RuralGenerator(this);
 		generatorAir = new AirGenerator(this);
 		generatorUnknown = new UnknownGenerator(this);
 	}
@@ -80,12 +104,18 @@ public class Generator {
 			return (byte) Material.LAPIS_ORE.getId();
 		else if (generator == generatorGround)
 			return (byte) Material.DIRT.getId();
-		else if (generator == generatorUrban)
-			return (byte) Material.BOOKSHELF.getId();
-		else if (generator == generatorSuburban)
+		else if (generator == generatorParks)
+			return (byte) Material.MYCEL.getId();
+		else if (generator == generatorEstates)
 			return (byte) Material.BRICK.getId();
-		else if (generator == generatorRural)
+		else if (generator == generatorForests)
+			return (byte) Material.LAPIS_BLOCK.getId();
+		else if (generator == generatorCities)
+			return (byte) Material.IRON_BLOCK.getId();
+		else if (generator == generatorNeighborhoods)
 			return (byte) Material.COBBLESTONE.getId();
+		else if (generator == generatorFarms)
+			return (byte) Material.DIAMOND_BLOCK.getId();
 		else if (generator == generatorRoad)
 			return (byte) Material.COAL_ORE.getId();
 		else if (generator == generatorAir)
@@ -161,12 +191,21 @@ public class Generator {
 		if (isRoad(chunkX, chunkZ))
 			return generatorRoad;
 		else if (isBuildable(chunkX, chunkZ))
-			if (isUrban(chunkX, chunkZ))
-				return generatorUrban;
-			else if (isRural(chunkX, chunkZ))
-				return generatorRural;
-			else //isSuburban
-				return generatorSuburban;
+			if (isGreenBelt(chunkX, chunkZ)) {
+				if (isUrban(chunkX, chunkZ))
+					return generatorParks;
+				else if (isSuburban(chunkX, chunkZ))
+					return generatorEstates;
+				else if (isRural(chunkX, chunkZ))
+					return generatorForests;
+			} else {
+				if (isUrban(chunkX, chunkZ))
+					return generatorCities;
+				else if (isSuburban(chunkX, chunkZ))
+					return generatorNeighborhoods;
+				else if (isRural(chunkX, chunkZ))
+					return generatorFarms;
+			}
 		
 		// all else fails
 		return generatorAir;
@@ -221,22 +260,34 @@ public class Generator {
 		return !isWater(x, z) && !isRoad(x, z);
 	}
 	
-	public boolean isUrban(int x, int z) {
-		return generatorUrban.isChunk(x, z);
+	public boolean isGreenBelt(int x, int z) {
+		double noiseLevel = (noiseGreenBelt.noise(x / xGreenBeltFactor, z / zGreenBeltFactor) + 1) / 2;
+		return noiseLevel > threshholdGreenBeltMin && noiseLevel < threshholdGreenBeltMax;
 	}
-	
-	public boolean isUrbanBuilding(int x, int z) {
-		return isBuildable(x, z) && isUrban(x, z);
+
+	public boolean isUrban(int x, int z) {
+		double noiseLevel = (noiseUrbanization.noise(x / xUrbanizationFactor, z / zUrbanizationFactor) + 1) / 2;
+		return noiseLevel >= threshholdUrban;
 	}
 	
 	public boolean isSuburban(int x, int z) {
-		return generatorSuburban.isChunk(x, z);
+		double noiseLevel = (noiseUrbanization.noise(x / xUrbanizationFactor, z / zUrbanizationFactor) + 1) / 2;
+		return noiseLevel >= threshholdSuburban && noiseLevel < threshholdUrban;
 	}
 	
 	public boolean isRural(int x, int z) {
-		return generatorRural.isChunk(x, z);
+		double noiseLevel = (noiseUrbanization.noise(x / xUrbanizationFactor, z / zUrbanizationFactor) + 1) / 2;
+		return noiseLevel < threshholdSuburban;
 	}
-
+	
+	public boolean isUrbanBuilding(int x, int z) {
+		return isUrban(x, z) && isBuildable(x, z);
+	}
+	
+	public double getUrbanLevel(int x, int z) {
+		return (((noiseUrbanization.noise(x / xUrbanizationFactor, z / zUrbanizationFactor) + 1) / 2) - threshholdUrban) / (1 - threshholdUrban);
+	}
+	
 	public boolean isRoad(int x, int z) {
 		return generatorRoad.isChunk(x, z);
 	}

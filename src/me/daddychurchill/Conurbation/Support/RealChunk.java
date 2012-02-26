@@ -81,6 +81,36 @@ public class RealChunk {
 		}
 	}
 
+	public void setBlocks(int x, int y1, int y2, int z, Material material, byte data) {
+		for (int y = y1; y < y2; y++)
+			chunk.getBlock(x, y, z).setTypeIdAndData(material.getId(), data, doPhysics);
+	}
+
+	public void setBlocks(int x, int y1, int y2, int z, Material material, byte data, boolean aDoPhysics) {
+		for (int y = y1; y < y2; y++)
+			chunk.getBlock(x, y, z).setTypeIdAndData(material.getId(), data, aDoPhysics);
+	}
+
+	public void setBlocks(int x1, int x2, int y1, int y2, int z1, int z2, Material material, byte data, boolean aDoPhysics) {
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				for (int z = z1; z < z2; z++) {
+					chunk.getBlock(x, y, z).setTypeIdAndData(material.getId(), data, aDoPhysics);
+				}
+			}
+		}
+	}
+
+	public void setBlocks(int x1, int x2, int y1, int y2, int z1, int z2, Material material, byte data) {
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				for (int z = z1; z < z2; z++) {
+					chunk.getBlock(x, y, z).setTypeIdAndData(material.getId(), data, doPhysics);
+				}
+			}
+		}
+	}
+
 	public void setBlocks(int x1, int x2, int y1, int y2, int z1, int z2, int type, byte data) {
 		for (int x = x1; x < x2; x++) {
 			for (int y = y1; y < y2; y++) {

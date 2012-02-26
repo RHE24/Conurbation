@@ -10,14 +10,8 @@ import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
-public class UrbanGenerator extends PlatGenerator {
+public class CityGenerator extends PlatGenerator {
 
-	private final static double xUrbanFactor = 30.0;
-	private final static double zUrbanFactor = 30.0;
-	private final static double threshholdUrban = 0.50;
-	
-	private final static double xMaterialFactor = 5.0;
-	private final static double zMaterialFactor = 5.0;
 	
 	private final static double xHeightFactor = 2.0;
 	private final static double zHeightFactor = 2.0;
@@ -25,17 +19,12 @@ public class UrbanGenerator extends PlatGenerator {
 	public final static double floorDeviance = 4.0;
 	private int firstFloorY;
 	
-	private SimplexNoiseGenerator noiseUrban;
-	private SimplexNoiseGenerator noiseFeature; // which building material set to use (if an adjacent chunk is similar then join them)
 	private SimplexNoiseGenerator noiseHeightDeviance; // add/subtract a little from the normal height for this building
 	
-	public UrbanGenerator(Generator noise) {
+	public CityGenerator(Generator noise) {
 		super(noise);
 		
-		noiseUrban = new SimplexNoiseGenerator(noise.getNextSeed());
-		noiseFeature = new SimplexNoiseGenerator(noise.getNextSeed());
 		noiseHeightDeviance = new SimplexNoiseGenerator(noise.getNextSeed());
-		
 		firstFloorY = noise.getStreetLevel() + 1;
 	}
 
@@ -78,17 +67,15 @@ public class UrbanGenerator extends PlatGenerator {
 
 	@Override
 	public boolean isChunk(int chunkX, int chunkZ) {
-		double noiseLevel = (noiseUrban.noise(chunkX / xUrbanFactor, chunkZ / zUrbanFactor) + 1) / 2;
-		return noiseLevel > threshholdUrban;
+		return noise.isUrban(chunkX, chunkZ) && !noise.isGreenBelt(chunkX, chunkZ);
 	}
 	
 	public int getUrbanHeight(int x, int z) {
-		double urbanLevel = (((noiseUrban.noise(x / xUrbanFactor, z / zUrbanFactor) + 1) / 2) - threshholdUrban) / (1 - threshholdUrban);
 		double devianceAmount = (noiseHeightDeviance.noise(x / xHeightFactor, z / zHeightFactor) + 1) / 2 * floorDeviance;
-		return Math.max(1, NoiseGenerator.floor(urbanLevel * noise.getMaximumFloors() - devianceAmount));
+		return Math.max(1, NoiseGenerator.floor(noise.getUrbanLevel(x, z) * noise.getMaximumFloors() - devianceAmount));
 	}
 	
-	//TODO change this to an enum
+	//TODO change this to an enum... maybe
 	private final static int featureWallMaterial = 0;
 	private final static int featureFloorMaterial = 1;
 	// connected buildings
@@ -131,8 +118,4 @@ public class UrbanGenerator extends PlatGenerator {
 		}
 	}
 	
-	public int randomFeatureAt(int chunkX, int chunkZ, int slot, int range) {
-		return NoiseGenerator.floor((noiseFeature.noise(chunkX / xMaterialFactor, slot, chunkZ / zMaterialFactor) + 1) / 2 * range);
-	}
-
 }

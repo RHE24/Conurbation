@@ -1,17 +1,17 @@
 package me.daddychurchill.Conurbation.Neighbors;
 
-import me.daddychurchill.Conurbation.Plats.UrbanGenerator;
+import me.daddychurchill.Conurbation.Plats.CityGenerator;
 
 public class UrbanNeighbors {
 
-	private UrbanGenerator[][] neighbors;
+	private CityGenerator[][] neighbors;
 	private int[][] above;
 	//private int[][] below;
 	
-	public UrbanNeighbors(UrbanGenerator center, int chunkX, int chunkZ) {
+	public UrbanNeighbors(CityGenerator center, int chunkX, int chunkZ) {
 		super();
 		
-		neighbors = new UrbanGenerator[3][3];
+		neighbors = new CityGenerator[3][3];
 		for (int x = 0; x < 3; x++)
 			for (int z = 0; z < 3; z++) {
 				int offsetX = x - 1;
