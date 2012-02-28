@@ -15,6 +15,8 @@ public class ParkGenerator extends PlatGenerator {
 	public final static byte byteGround = (byte) matGround.getId();
 	public final static Material matTurf = Material.GRASS;
 	public final static byte byteTurf = (byte) matTurf.getId();
+	public final static Material matTrunk = Material.LOG;
+	
 	int groundLevel;
 	int fenceLevel;
 	
@@ -43,11 +45,11 @@ public class ParkGenerator extends PlatGenerator {
 		boolean roadToWest = noise.isRoad(chunkX - 1, chunkZ);
 		boolean roadToEast = noise.isRoad(chunkX + 1, chunkZ);
 		
-		// roll the dice
-		boolean sidewalkNorth = isThereASidewalk(random);
-		boolean sidewalkSouth = isThereASidewalk(random);
-		boolean sidewalkWest = isThereASidewalk(random);
-		boolean sidewalkEast = isThereASidewalk(random);
+		// assume the best
+		boolean sidewalkNorth = true;
+		boolean sidewalkSouth = true;
+		boolean sidewalkWest = true;
+		boolean sidewalkEast = true;
 		
 		// draw the underlayment
 		chunk.setLayer(groundLevel - 1, byteGround);
@@ -55,13 +57,13 @@ public class ParkGenerator extends PlatGenerator {
 		
 		// draw the fences
 		if (roadToNorth)
-			generateFence(chunk, sidewalkNorth, 0, 16, fenceLevel, 0, 1);
+			sidewalkNorth = generateFence(chunk, random, 0, 16, fenceLevel, 0, 1);
 		if (roadToSouth)
-			generateFence(chunk, sidewalkSouth, 0, 16, fenceLevel, 15, 16);
+			sidewalkSouth = generateFence(chunk, random, 0, 16, fenceLevel, 15, 16);
 		if (roadToWest) 
-			generateFence(chunk, sidewalkWest, 0, 1, fenceLevel, 0, 16);
+			sidewalkWest = generateFence(chunk, random, 0, 1, fenceLevel, 0, 16);
 		if (roadToEast) 
-			generateFence(chunk, sidewalkEast, 15, 16, fenceLevel, 0, 16);
+			sidewalkEast = generateFence(chunk, random, 15, 16, fenceLevel, 0, 16);
 		
 		// draw the sidewalks
 		if (sidewalkNorth)
@@ -95,12 +97,23 @@ public class ParkGenerator extends PlatGenerator {
 					// plant some plants
 					double plantNoise = random.nextDouble();
 					
-					if (plantNoise < oddsOfTree) {
-						world.generateTree(chunk.getBlockLocation(x, y, z), getRandomTreeType(random));
-					} else if (plantNoise < oddsOfFlower) {
-						chunk.setBlock(x, y, z, getRandomFlowerType(random), (byte) 0, false);
-					} else if (plantNoise < oddsOfGrass) {
-						chunk.setBlock(x, y, z, intGrassBlades, (byte) 1, false);
+					// dead or not?
+					if (noise.isDecrepit(random)) {
+						if (plantNoise < oddsOfTree) {
+							chunk.setBlocks(x, y, y + random.nextInt(4), z, matTrunk);
+						} else if (plantNoise < oddsOfFlower) {
+							chunk.setBlock(x, y, z, FarmGenerator.deadOnDirt);
+						}
+						
+					// its ALIVE!
+					} else {
+						if (plantNoise < oddsOfTree) {
+							world.generateTree(chunk.getBlockLocation(x, y, z), getRandomTreeType(random));
+						} else if (plantNoise < oddsOfFlower) {
+							chunk.setBlock(x, y, z, getRandomFlowerType(random), (byte) 0, false);
+						} else if (plantNoise < oddsOfGrass) {
+							chunk.setBlock(x, y, z, intGrassBlades, (byte) 1, false);
+						}
 					}
 				}
 			}
@@ -129,8 +142,10 @@ public class ParkGenerator extends PlatGenerator {
 	
 	private boolean generateCenterplace(ByteChunk chunk, int chunkX, int chunkZ) {
 		boolean doCenterplace = ifFeatureAt(chunkX, chunkZ, featureCenterplace, oddsCenterplace);
-		if (doCenterplace)
+		if (doCenterplace) {
 			generateParkwalk(chunk, 4, 12, groundLevel, 4, 12);
+			chunk.setCircle(8, 8, 2, groundLevel + 1, byteCobblestone);
+		}
 		return doCenterplace;
 	}
 }

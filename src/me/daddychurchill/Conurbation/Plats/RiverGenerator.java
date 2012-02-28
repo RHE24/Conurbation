@@ -49,7 +49,7 @@ public class RiverGenerator extends WaterGenerator {
 				for (int z = 0; z < 16; z++) {
 					generateChunkColumn(chunk, chunkX, chunkZ, x, z, getGroundSurfaceY(chunkX, chunkZ, x, z));
 				}
-		generateSeawalls(chunk, chunkX, chunkZ);
+		generateSeawalls(chunk, random, chunkX, chunkZ);
 	}
 	
 	@Override

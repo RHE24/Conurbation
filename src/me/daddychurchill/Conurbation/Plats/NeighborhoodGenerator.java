@@ -17,8 +17,10 @@ public class NeighborhoodGenerator extends PlatGenerator {
 	public final static byte byteGrass = (byte) matGrass.getId();
 	
 	public final static double oddsOfHouse = 0.70;
+	public final static double oddsOfSecondFloor = 0.40;
 
 	private final static int slotHouse = 0;
+	private final static int slotSecondFloor = 1;
 	
 	int groundLevel;
 	
@@ -39,8 +41,14 @@ public class NeighborhoodGenerator extends PlatGenerator {
 		chunk.setLayer(groundLevel + 1, byteGrass);
 		
 		// do one?
-		if (isHouse(chunkX, chunkZ))
-			HouseFactory.generate(chunk, random, chunkX, chunkZ, groundLevel + 2);
+		if (isHouse(chunkX, chunkZ)) {
+			byte byteFloor = pickFloorMaterial(chunkX, chunkZ);
+			byte byteWall = pickWallMaterial(chunkX, chunkZ);
+			byte byteRoof = pickRoofMaterial(chunkX, chunkZ);
+			int floors = ifFeatureAt(chunkX, chunkZ, slotSecondFloor, oddsOfSecondFloor) ? 2 : 1;
+			
+			HouseFactory.generateColonial(chunk, random, chunkX, chunkZ, groundLevel + 2, byteFloor, byteWall, byteRoof, floors);
+		}
 	}
 
 	@Override
@@ -52,17 +60,19 @@ public class NeighborhoodGenerator extends PlatGenerator {
 	@Override
 	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
 		chunk.setBlock(blockX, groundLevel, blockZ, byteGround);
-		return groundLevel;
+		chunk.setBlock(blockX, groundLevel + 1, blockZ, byteGrass);
+		
+		return groundLevel + 1;
 	}
 
 	@Override
 	public int getGroundSurfaceY(int chunkX, int chunkZ, int blockX, int blockZ) {
-		return groundLevel;
+		return groundLevel + 1;
 	}
 
 	@Override
 	public Material getGroundSurfaceMaterial(int chunkX, int chunkZ) {
-		return matGround;
+		return matGrass;
 	}
 	
 	private boolean isHouse(int chunkX, int chunkZ) {

@@ -60,6 +60,7 @@ public class Generator {
 	private int streetLevel;
 	private int seabedLevel;
 	private int maximumFloors;
+	private double decrepitLevel;
 
 	public final static int floorHeight = 4;
 	public final static int floorsReserved = 2;
@@ -75,6 +76,8 @@ public class Generator {
 		maximumLevel = world.getMaxHeight();
 		streetLevel = this.config.getStreetLevel();
 		seabedLevel = this.config.getSeabedLevel();
+		decrepitLevel = this.config.getDecrepitLevel();
+		
 		if (streetLevel < 0)
 			streetLevel = world.getSeaLevel() + WaterGenerator.shoreHeight;
 		if (seabedLevel < 0)
@@ -150,6 +153,10 @@ public class Generator {
 	
 	public int getMaximumFloors() {
 		return maximumFloors;
+	}
+	
+	public boolean isDecrepit(Random random) {
+		return random.nextDouble() < decrepitLevel;
 	}
 	
 	public void generate(ByteChunk byteChunk, Random random, int chunkX, int chunkZ) {

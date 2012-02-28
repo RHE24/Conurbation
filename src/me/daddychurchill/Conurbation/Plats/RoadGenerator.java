@@ -6,7 +6,6 @@ import java.util.Random;
 import org.bukkit.Material;
 import org.bukkit.util.noise.SimplexNoiseGenerator;
 
-import me.daddychurchill.Conurbation.Conurbation;
 import me.daddychurchill.Conurbation.Generator;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
 import me.daddychurchill.Conurbation.Support.RealChunk;
@@ -30,9 +29,6 @@ public class RoadGenerator extends PlatGenerator {
 	public final static Material workingTorchMaterial = Material.TORCH;
 	public final static Material brokeLampMaterial = Material.GLASS;
 	public final static Material brokeTorchMaterial = Material.REDSTONE_TORCH_OFF;
-	
-	private double brokenLampOdds = 0.2;
-	private double brokenTorchOdds = 0.4;
 	
 	public final static int roadCellSize = 4;
 	private final static double xIntersectionFactor = 6;
@@ -163,25 +159,32 @@ public class RoadGenerator extends PlatGenerator {
 
 		// light posts
 		boolean isTorch = noise.isRural(chunkX, chunkZ);
-		generateLightPost(chunk, sidewalkWidth - 1, sidewalkWidth - 1, isTorch, random.nextDouble());
-		generateLightPost(chunk, chunk.Width - sidewalkWidth, chunk.Width - sidewalkWidth, isTorch, random.nextDouble());
+		generateLightPost(chunk, random, sidewalkWidth - 1, sidewalkWidth - 1, isTorch);
+		generateLightPost(chunk, random, chunk.Width - sidewalkWidth, chunk.Width - sidewalkWidth, isTorch);
+		
+		// tell users where they are
+		generateStreetSigns(chunk, random, sidewalkWidth - 1, sidewalkWidth - 1, fixRoadCoordinate(chunkX), fixRoadCoordinate(chunkZ));
 	}
 
-	protected void generateLightPost(RealChunk chunk, int x, int z, boolean isTorch, double chanceBroken) {
+	protected void generateLightPost(RealChunk chunk, Random random, int x, int z, boolean isTorch) {
 		int sidewalkLevel = streetLevel + 1;
 		chunk.setBlock(x, sidewalkLevel, z, lightpostbaseMaterial);
 		chunk.setBlocks(x, sidewalkLevel + 1, sidewalkLevel + lightpostHeight + 1, z, lightpostMaterial);
 		if (isTorch) {
-			if (chanceBroken < brokenTorchOdds)
+			if (noise.isDecrepit(random))
 				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, brokeTorchMaterial.getId(), (byte)5, false);
 			else
 				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, workingTorchMaterial.getId(), (byte)5, true);
 		} else {
-			if (chanceBroken < brokenLampOdds)
+			if (noise.isDecrepit(random))
 				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, brokeLampMaterial, false);
 			else
 				chunk.setBlock(x, sidewalkLevel + lightpostHeight + 1, z, workingLampMaterial, true);
 		}
+	}
+	
+	protected void generateStreetSigns(RealChunk chunk, Random random, int blockX, int blockZ, int streetX, int streetZ) {
+		//TODO populate streetsigns (some are missing depending on decrepitude)
 	}
 	
 	@Override
@@ -195,8 +198,8 @@ public class RoadGenerator extends PlatGenerator {
 	}
 
 	//TODO put in the "cross bridge" test in once the caching works
-	private int lookupTotal = 0;
-	private int lookupSlow = 0;
+//	private int lookupTotal = 0;
+//	private int lookupSlow = 0;
 	
 	@Override
 	public boolean isChunk(int chunkX, int chunkZ) {
@@ -210,10 +213,10 @@ public class RoadGenerator extends PlatGenerator {
 		if (roadExists) {
 			
 			// check the cache, if it exists then assume we have a road
-			lookupTotal++;
+//			lookupTotal++;
 			Long roadId = getChunkKey(chunkX, chunkZ);
 			if (!knownRoads.contains(roadId)) {
-				lookupSlow++;
+//				lookupSlow++;
 				
 				// is this an intersection?
 				if (checkedX && checkedZ) {
@@ -308,9 +311,9 @@ public class RoadGenerator extends PlatGenerator {
 					knownRoads.add(roadId);
 			}
 
-			if (lookupTotal % 200 == 0) {
-				Conurbation.log.info("Road cache miss ratio: " + lookupSlow + "/" + lookupTotal);
-			}
+//			if (lookupTotal % 200 == 0) {
+//				Conurbation.log.info("Road cache miss ratio: " + lookupSlow + "/" + lookupTotal);
+//			}
 		}
 		
 		// tell the world

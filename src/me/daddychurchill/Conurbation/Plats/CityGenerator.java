@@ -7,19 +7,23 @@ import org.bukkit.util.noise.NoiseGenerator;
 import org.bukkit.util.noise.SimplexNoiseGenerator;
 
 import me.daddychurchill.Conurbation.Generator;
+import me.daddychurchill.Conurbation.Neighbors.CityNeighbors;
 import me.daddychurchill.Conurbation.Support.ByteChunk;
 import me.daddychurchill.Conurbation.Support.RealChunk;
 
 public class CityGenerator extends PlatGenerator {
 
-	
 	private final static double xHeightFactor = 2.0;
 	private final static double zHeightFactor = 2.0;
-
 	public final static double floorDeviance = 4.0;
+	private SimplexNoiseGenerator noiseHeightDeviance; // add/subtract a little from the normal height for this building
+
 	private int firstFloorY;
 	
-	private SimplexNoiseGenerator noiseHeightDeviance; // add/subtract a little from the normal height for this building
+	private final static int featureWallMaterial = 0;
+	private final static int featureFloorMaterial = 1;
+	private final static int featureRoofMaterial = 2;
+	private final static int featureGlassStyle = 3;
 	
 	public CityGenerator(Generator noise) {
 		super(noise);
@@ -27,22 +31,114 @@ public class CityGenerator extends PlatGenerator {
 		noiseHeightDeviance = new SimplexNoiseGenerator(noise.getNextSeed());
 		firstFloorY = noise.getStreetLevel() + 1;
 	}
-
+	
 	@Override
 	public void generateChunk(ByteChunk chunk, Random random, int chunkX, int chunkZ) {
+		chunk.setLayer(firstFloorY - 1, byteStone);
 		chunk.setLayer(firstFloorY, RoadGenerator.byteSidewalk);
 		
-		int floors = getUrbanHeight(chunkX, chunkZ);
-		byte wallMaterial = getWallMaterial(chunkX, chunkZ);
-		byte floorMaterial = getFloorMaterial(chunkX, chunkZ);
+		// who is where?
+		CityNeighbors neighbors = new CityNeighbors(this, chunkX, chunkZ);
+		int glassSkip = randomFeatureAt(chunkX, chunkZ, featureGlassStyle, 4) + 1;
 		
-		for (int i = 0; i < floors; i++) {
-			int y = i * Generator.floorHeight;
-			chunk.setBlocks(1, 15, firstFloorY + y, firstFloorY + y + 1, 1, 15, floorMaterial);
-			chunk.setBlocks(1, 15, firstFloorY + y + 1, firstFloorY + y + Generator.floorHeight, 1, 15, wallMaterial);
+		for (int i = 0; i < neighbors.floors; i++) {
+			int y1 = firstFloorY + i * Generator.floorHeight;
+			int y2 = y1 + Generator.floorHeight;
+			
+			// look around!
+			int insetNorth = neighbors.insetToNorth();
+			int insetSouth = neighbors.insetToSouth();
+			int insetWest = neighbors.insetToWest();
+			int insetEast = neighbors.insetToEast();
+			
+			// place floor
+			if (i == 0)
+				generateFloor(chunk, neighbors, insetNorth, insetSouth, insetWest, insetEast, y1, neighbors.floorMaterial);
+			
+			// do the walls... maybe
+			if (insetNorth > 0) {
+				//wallMaterial = (byte) Material.BOOKSHELF.getId();
+				generateNSWall(chunk, random, insetWest, chunk.Width - insetEast, y1, y2, insetNorth, insetNorth + 1, neighbors.wallMaterial, glassSkip);
+			}
+			if (insetSouth > 0) {
+				//wallMaterial = (byte) Material.GOLD_BLOCK.getId();
+				generateNSWall(chunk, random, insetWest, chunk.Width - insetEast, y1, y2, chunk.Width - insetSouth - 1, chunk.Width - insetSouth, neighbors.wallMaterial, glassSkip);
+			}
+			if (insetWest > 0) {
+				//wallMaterial = (byte) Material.LAPIS_BLOCK.getId();
+				generateEWWall(chunk, random, insetWest, insetWest + 1, y1, y2, insetNorth, chunk.Width - insetSouth, neighbors.wallMaterial, glassSkip);
+			}
+			if (insetEast > 0) {
+				//wallMaterial = (byte) Material.IRON_BLOCK.getId();
+				generateEWWall(chunk, random, chunk.Width - insetEast - 1, chunk.Width - insetEast, y1, y2, insetNorth, chunk.Width - insetSouth, neighbors.wallMaterial, glassSkip);
+			}
+			
+			// top it off
+			if (i == neighbors.floors - 1)
+				generateFloor(chunk, neighbors, insetNorth, insetSouth, insetWest, insetEast, y2, neighbors.roofMaterial);
+			else
+				generateFloor(chunk, neighbors, insetNorth, insetSouth, insetWest, insetEast, y2, neighbors.floorMaterial);
+			
+			// move up
+			neighbors.decrement();
 		}
 	}
-
+	
+	private void generateFloor(ByteChunk chunk, CityNeighbors neighbors, int insetNorth, int insetSouth, int insetWest, int insetEast, int y1, byte material) {
+		int y2 = y1 + 1;
+		
+		// center part
+		chunk.setBlocks(insetWest, chunk.Width - insetEast, y1, y2, insetNorth, chunk.Width - insetSouth, material);
+		
+		// now the outer bits
+		if (insetNorth > 0 || insetSouth > 0 || insetWest > 0 || insetEast > 0) {
+			
+			// cardinal bits
+			if (neighbors.toNorth())
+				chunk.setBlocks(insetEast, chunk.Width - insetWest, y1, y2, 0, insetNorth, material);
+			if (neighbors.toSouth())
+				chunk.setBlocks(insetEast, chunk.Width - insetWest, y1, y2, chunk.Width - insetSouth, chunk.Width, material);
+			if (neighbors.toWest())
+				chunk.setBlocks(0, insetWest, y1, y2, insetNorth, chunk.Width - insetSouth, material);
+			if (neighbors.toEast())
+				chunk.setBlocks(chunk.Width - insetEast, chunk.Width, y1, y2, insetNorth, chunk.Width - insetSouth, material);
+		
+			// corner bits
+			if (neighbors.toNorthWest())
+				chunk.setBlocks(0, insetWest, y1, y2, 0, insetNorth, material);
+			if (neighbors.toNorthEast())
+				chunk.setBlocks(chunk.Width - insetEast, chunk.Width, y1, y2, 0, insetNorth, material);
+			if (neighbors.toSouthWest())
+				chunk.setBlocks(0, insetWest, y1, y2, chunk.Width - insetSouth, chunk.Width, material);
+			if (neighbors.toSouthEast())
+				chunk.setBlocks(chunk.Width - insetEast, chunk.Width, y1, y2, chunk.Width - insetSouth, chunk.Width, material);
+		}
+	}
+	
+	private void generateNSWall(ByteChunk chunk, Random random, int x1, int x2, int y1, int y2, int z1, int z2, byte wallMaterial, int glassSkip) {
+		chunk.setBlocks(x1, x2, y1 + 1, y1 + 2, z1, z2, wallMaterial);
+		for (int x = x1; x < x2; x++) {
+			byte material = byteWindow;
+			if (x == x1 || x == x2 - 1 || 
+					(glassSkip == 1 && random.nextBoolean() || 
+					(glassSkip > 1 && x % glassSkip == 0)))
+				material = wallMaterial;
+			chunk.setBlocks(x, x + 1, y1 + 2, y2, z1, z2, material);
+		}
+	}
+	
+	private void generateEWWall(ByteChunk chunk, Random random, int x1, int x2, int y1, int y2, int z1, int z2, byte wallMaterial, int glassSkip) {
+		chunk.setBlocks(x1, x2, y1 + 1, y1 + 2, z1, z2, wallMaterial);
+		for (int z = z1; z < z2; z++) {
+			byte material = byteWindow;
+			if (z == z1 || z == z2 - 1 || 
+					(glassSkip == 1 && random.nextBoolean() || 
+					(glassSkip > 1 && z % glassSkip == 0)))
+				material = wallMaterial;
+			chunk.setBlocks(x1, x2, y1 + 2, y2, z, z + 1, material);
+		}
+	}
+	
 	@Override
 	public int generateChunkColumn(ByteChunk chunk, int chunkX, int chunkZ, int blockX, int blockZ) {
 		chunk.setBlock(blockX, firstFloorY, blockZ, RoadGenerator.byteSidewalk);
@@ -75,9 +171,6 @@ public class CityGenerator extends PlatGenerator {
 		return Math.max(1, NoiseGenerator.floor(noise.getUrbanLevel(x, z) * noise.getMaximumFloors() - devianceAmount));
 	}
 	
-	//TODO change this to an enum... maybe
-	private final static int featureWallMaterial = 0;
-	private final static int featureFloorMaterial = 1;
 	// connected buildings
 	// wall material 
 	// window material
@@ -90,23 +183,32 @@ public class CityGenerator extends PlatGenerator {
 	//TODO Inset Walls NS/EW
 	//TODO Inset Floors NS/EW
 	
-	private byte getWallMaterial(int chunkX, int chunkZ) {
-		switch(randomFeatureAt(chunkX, chunkZ, featureWallMaterial, 5)) {
+	public byte getWallMaterial(int chunkX, int chunkZ) {
+		switch(randomFeatureAt(chunkX, chunkZ, featureWallMaterial, 4)) {
 		case 1:
 			return (byte) Material.BRICK.getId();
 		case 2:
-			return (byte) Material.COBBLESTONE.getId();
-		case 3:
 			return (byte) Material.SAND.getId();
-		case 4:
+		case 3:
 			return (byte) Material.CLAY.getId();
 		default:
 			return (byte) Material.SMOOTH_BRICK.getId();
 		}
 	}
 	
-	private byte getFloorMaterial(int chunkX, int chunkZ) {
-		switch(randomFeatureAt(chunkX, chunkZ, featureFloorMaterial, 4)) {
+	public byte getFloorMaterial(int chunkX, int chunkZ) {
+		switch(randomFeatureAt(chunkX, chunkZ, featureFloorMaterial, 3)) {
+		case 1:
+			return (byte) Material.WOOD.getId();
+		case 2:
+			return (byte) Material.WOOL.getId();
+		default:
+			return (byte) Material.SMOOTH_BRICK.getId();
+		}
+	}
+	
+	public byte getRoofMaterial(int chunkX, int chunkZ) {
+		switch(randomFeatureAt(chunkX, chunkZ, featureRoofMaterial, 4)) {
 		case 1:
 			return (byte) Material.WOOD.getId();
 		case 2:

@@ -41,7 +41,7 @@ public class LakeGenerator extends WaterGenerator {
 				generateChunkColumn(chunk, chunkX, chunkZ, x, z, getGroundSurfaceY(chunkX, chunkZ, x, z));
 			}
 		}
-		generateSeawalls(chunk, chunkX, chunkZ);
+		generateSeawalls(chunk, random, chunkX, chunkZ);
 	}
 
 	@Override
