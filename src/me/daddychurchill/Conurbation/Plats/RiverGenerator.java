@@ -14,7 +14,7 @@ public class RiverGenerator extends WaterGenerator {
 	public final static double xRiverFactor = 40.0;
 	public final static double zRiverFactor = 40.0;
 	public final static double threshholdMinRiver = 0.40;
-	public final static double threshholdMaxRiver = 0.50;
+	public final static double threshholdMaxRiver = 0.525;
 	public final static double xRiverbedNoiseFactor = 2.5;
 	public final static double zRiverbedNoiseFactor = 2.5;
 	public final static double scaleRiverbedNoise = 3.0;

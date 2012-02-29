@@ -61,6 +61,9 @@ public class Generator {
 	private int seabedLevel;
 	private int maximumFloors;
 	private double decrepitLevel;
+	private boolean includeAgricultureZones;
+	private boolean includeResidentialZones;
+	private boolean includeUrbanZones;
 
 	public final static int floorHeight = 4;
 	public final static int floorsReserved = 2;
@@ -77,6 +80,9 @@ public class Generator {
 		streetLevel = this.config.getStreetLevel();
 		seabedLevel = this.config.getSeabedLevel();
 		decrepitLevel = this.config.getDecrepitLevel();
+		includeAgricultureZones = this.config.getIncludeAgricultureZones();
+		includeResidentialZones = this.config.getIncludeResidentialZones();
+		includeUrbanZones = this.config.getIncludeUrbanZones();
 		
 		if (streetLevel < 0)
 			streetLevel = world.getSeaLevel() + WaterGenerator.shoreHeight;
@@ -200,18 +206,33 @@ public class Generator {
 		else if (isBuildable(chunkX, chunkZ))
 			if (isGreenBelt(chunkX, chunkZ)) {
 				if (isUrban(chunkX, chunkZ))
-					return generatorParks;
+					if (includeUrbanZones)
+						return generatorParks;
+					else
+						return generatorForests;
 				else if (isSuburban(chunkX, chunkZ))
-					return generatorEstates;
+					if (includeResidentialZones)
+						return generatorEstates;
+					else
+						return generatorForests;
 				else if (isRural(chunkX, chunkZ))
 					return generatorForests;
 			} else {
 				if (isUrban(chunkX, chunkZ))
-					return generatorCities;
+					if (includeUrbanZones)
+						return generatorCities;
+					else
+						return generatorForests;
 				else if (isSuburban(chunkX, chunkZ))
-					return generatorNeighborhoods;
+					if (includeResidentialZones)
+						return generatorNeighborhoods;
+					else
+						return generatorForests;
 				else if (isRural(chunkX, chunkZ))
-					return generatorFarms;
+					if (includeAgricultureZones)
+						return generatorFarms;
+					else
+						return generatorForests;
 			}
 		
 		// all else fails
