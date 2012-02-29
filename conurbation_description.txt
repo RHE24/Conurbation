@@ -1,4 +1,59 @@
 == **Conurbation** ==
-CityWorld variant
 
-===== //Version 0.02// ===== 
+Conurbation started off as an exploration exercise on adding regional areas to CityWorld. 
+Now the code base has diverged enough that I am not sure the two project will ever come together again. 
+This might be for the best as some folks want a world full of city and others want more regional variety. 
+Only time will tell if the two project will merge again… hard to tell.
+
+===== //Version 0.03// ===== 
+,,//(sometimes there is a delay in getting the new version of the plugin through the approval process, if the above version isn't available check back in an hour or so)//,,
+ 
+=== Alpha ===
+This is an Alpha of the new plugin. 
+There are numerous continuity issues and none of the very simple buildings have “doors”, “stairs”, etc… those features will show up in future releases.
+I am looking for feedback on the new generator, the forums have got some "prepopulated" threads on specific areas.
+Feel free to add your comments to them or add a new thread, thanks.
+
+==== Technical info ====
+* v0.03 Added config.yml options to control if farms, residential or urban areas are generated. If that area is not generated a sculpted forest will be generated instead.
+* v0.02 Initial release
+
+Permissions for Conurbation command (used your favorite perms plugin)
+* Conurbation.command (defaults to op)
+
+Config option file is now generated when Conurbation runs. 
+These options only affect "new generation" and are not world specific (yet). 
+Changing them after a world has been generated will produce some odd results at times.
+* Global.StreetLevel (defaults to -1) //where does the street generate, -1 means halfway between as low as it can get and as high as it can get// 
+* Global.SeabedLevel (defaults to -1) //where does the seabed generate, -1 means 1/4 of the distance allows down from the street level//
+* Global.DecrepitLevel (defaults to 0.1) //how "decayed" is the generation. for now this only effects streetlights, farms and parks//
+* Global.IncludeAgricultureZones (defaults to true) //generate farms or not. if not then sculpted forests will generated instead// 
+* Global.IncludeResidentialZones (defaults to true) //generate houses or not. if not then sculpted forests will generated instead// 
+* Global.IncludeUrbanZones (defaults to true) //generate city buildings or not. if not then sculpted forests will generated instead// 
+
+=== Heads up! ===
+
+This plugin really "tests" MineCraft/Bukkit when it comes to complex worlds. 
+In fact when you spawn/teleport into a new Conurbation (or some wildly new location) it takes a while for all of the blocks to generate. 
+This is especially obvious if you are flying around. Once the blocks are generated though everything works just fine. 
+What I recommend is take a tour of your world and just walk/fly up to each "uninitialized chunk" until everything shows up.
+
+----
+=== Installing ===
+
+This is purely a world generator. 
+If you need teleportation or world management support there are plenty of plugins that will do that for you. 
+The Bukkit plugin ecosystem does not need more of those puppies. 
+This is JUST A WORLD GENERATOR. :-)
+
+To install it you will need to do three things...
+# **Download the plugin and place it in Bukkit's plugin folder.** If you don't know where or what the Bukkit's plugin folder is, read [[http://wiki.bukkit.org/Setting_up_a_server|this]].
+# **Now start up Minecraft Server via Bukkit.** If you don't know how to do this, I recommend rereading [[http://wiki.bukkit.org/Setting_up_a_server|this]].
+
+At this point, you may be asking yourself: **How do I get to the city?** 
+There are two options...
+# **Press "T", type in "/Conurbation" and press return (if you do this, remember that some plugins might not work with Conurbation until you modify bukkit's YML to include a reference to the world)
+# **OR... you can use a multiverse plugin and use the Conurbation as the generator for one of your worlds. We use [[http://dev.bukkit.org/server-mods/multiverse-core/|Multiverse]].
+
+If you are still confused then rereread [[http://wiki.bukkit.org/Setting_up_a_server|this]]. :-)
+
