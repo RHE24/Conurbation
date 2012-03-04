@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Conurbation extends JavaPlugin{
 	
-	public static final Logger log = Logger.getLogger("Minecraft.CityWorld");
+	public static final Logger log = Logger.getLogger("Minecraft.Conurbation");
    	
     public Conurbation() {
 		super();

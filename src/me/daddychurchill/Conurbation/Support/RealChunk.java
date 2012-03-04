@@ -7,26 +7,26 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class RealChunk {
 	private Chunk chunk;
 
-	public int X;
-	public int Z;
+	public int chunkX;
+	public int chunkZ;
 	private boolean doPhysics;
-	public int Width = 16;
-	public int Height;
+	public int width = 16;
+	public int height;
 
 	public RealChunk(World world, Chunk chunk) {
 		super();
 		this.chunk = chunk;
-		this.X = chunk.getX();
-		this.Z = chunk.getZ();
+		this.chunkX = chunk.getX();
+		this.chunkZ = chunk.getZ();
 		this.doPhysics = false;
-		Height = world.getMaxHeight();
+		height = world.getMaxHeight();
 	}
 	
 	public boolean getDoPhysics() {
@@ -122,17 +122,17 @@ public class RealChunk {
 	}
 
 	public int setLayer(int blocky, Material material) {
-		setBlocks(0, Width, blocky, blocky + 1, 0, Width, material);
+		setBlocks(0, width, blocky, blocky + 1, 0, width, material);
 		return blocky + 1;
 	}
 
 	public int setLayer(int blocky, int height, Material material) {
-		setBlocks(0, Width, blocky, blocky + height, 0, Width, material);
+		setBlocks(0, width, blocky, blocky + height, 0, width, material);
 		return blocky + height;
 	}
 
 	public int setLayer(int blocky, int height, int inset, Material material) {
-		setBlocks(inset, Width - inset, blocky, blocky + height, inset, Width - inset, material);
+		setBlocks(inset, width - inset, blocky, blocky + height, inset, width - inset, material);
 		return blocky + height;
 	}
 	
@@ -187,11 +187,11 @@ public class RealChunk {
 		}
 	}
 
-	public void setSpawner(int x, int y, int z, CreatureType aType) {
+	public void setSpawner(int x, int y, int z, EntityType aType) {
 		Block block = chunk.getBlock(x, y, z);
 		block.setType(Material.MOB_SPAWNER);
 		CreatureSpawner spawner = (CreatureSpawner) block.getState();
-		spawner.setCreatureType(aType);
+		spawner.setSpawnedType(aType);
 		spawner.update(true);
 	}
 }

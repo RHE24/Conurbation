@@ -1,6 +1,6 @@
 name: Conurbation
 main: me.daddychurchill.Conurbation.Conurbation
-version: 0.03
+version: 0.04
 load: startup
 author: DaddyChurchill
 commands:

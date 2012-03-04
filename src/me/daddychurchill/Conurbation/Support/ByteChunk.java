@@ -2,7 +2,6 @@ package me.daddychurchill.Conurbation.Support;
 
 import java.util.Arrays;
 
-import org.bukkit.Material;
 import org.bukkit.World;
 
 public class ByteChunk {
@@ -10,35 +9,35 @@ public class ByteChunk {
 	public int chunkX;
 	public int chunkZ;
 	public byte[] blocks;
-	public int Width;
-	public int Height;
+	public int width;
+	public int height;
 		
 	public ByteChunk (World world, int chunkX, int chunkZ) {
 		super();
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
-		this.Width = 16;
-		this.Height = world.getMaxHeight();
-		this.blocks = new byte[Width * Width * Height];
+		this.width = 16;
+		this.height = world.getMaxHeight();
+		this.blocks = new byte[width * width * height];
 	}
 	
 	public void setBlock(int x, int y, int z, byte materialId) {
-		blocks[(x * Width + z) * Height + y] = materialId;
+		blocks[(x * width + z) * height + y] = materialId;
 	}
 	
 	public byte getBlock(int x, int y, int z) {
-		return blocks[(x * Width + z) * Height + y];
+		return blocks[(x * width + z) * height + y];
 	}
 	
 	public void setBlocks(int x, int y1, int y2, int z, byte materialId) {
-		int xz = (x * Width + z) * Height;
+		int xz = (x * width + z) * height;
 		Arrays.fill(blocks, xz + y1, xz + y2, materialId);
 	}
 	
 	public void setBlocks(int x1, int x2, int y1, int y2, int z1, int z2, byte materialId) {
 		for (int x = x1; x < x2; x++) {
 			for (int z = z1; z < z2; z++) {
-				int xz = (x * Width + z) * Height;
+				int xz = (x * width + z) * height;
 				Arrays.fill(blocks, xz + y1, xz + y2, materialId);
 			}
 		}
@@ -47,24 +46,24 @@ public class ByteChunk {
 	public void setBlocks(int x1, int x2, int y1, int y2, int z1, int z2, byte primaryId, byte secondaryId, MaterialFactory maker) {
 		for (int x = x1; x < x2; x++) {
 			for (int z = z1; z < z2; z++) {
-				int xz = (x * Width + z) * Height;
+				int xz = (x * width + z) * height;
 				Arrays.fill(blocks, xz + y1, xz + y2, maker.pickMaterial(primaryId, secondaryId, x, z));
 			}
 		}
 	}
 	
 	public int setLayer(int blocky, byte materialId) {
-		setBlocks(0, Width, blocky, blocky + 1, 0, Width, materialId);
+		setBlocks(0, width, blocky, blocky + 1, 0, width, materialId);
 		return blocky + 1;
 	}
 	
 	public int setLayer(int blocky, int height, byte materialId) {
-		setBlocks(0, Width, blocky, blocky + height, 0, Width, materialId);
+		setBlocks(0, width, blocky, blocky + height, 0, width, materialId);
 		return blocky + height;
 	}
 	
 	public int setLayer(int blocky, int height, int inset, byte materialId) {
-		setBlocks(inset, Width - inset, blocky, blocky + height, inset, Width - inset, materialId);
+		setBlocks(inset, width - inset, blocky, blocky + height, inset, width - inset, materialId);
 		return blocky + height;
 	}
 	
@@ -132,7 +131,7 @@ public class ByteChunk {
 		// Ref: Notes/BCircle.PDF
 		int cx = inset;
 		int cz = inset;
-		int r = Width - inset * 2 - 1;
+		int r = width - inset * 2 - 1;
 		int x = r;
 		int z = 0;
 		int xChange = 1 - 2 * r;
@@ -162,8 +161,8 @@ public class ByteChunk {
 	public void setArcSouthWest(int inset, int y1, int y2, byte materialId, boolean fill) {
 		// Ref: Notes/BCircle.PDF
 		int cx = inset;
-		int cz = Width - inset;
-		int r = Width - inset * 2 - 1;
+		int cz = width - inset;
+		int r = width - inset * 2 - 1;
 		int x = r;
 		int z = 0;
 		int xChange = 1 - 2 * r;
@@ -192,9 +191,9 @@ public class ByteChunk {
 	
 	public void setArcNorthEast(int inset, int y1, int y2, byte materialId, boolean fill) {
 		// Ref: Notes/BCircle.PDF
-		int cx = Width - inset;
+		int cx = width - inset;
 		int cz = inset;
-		int r = Width - inset * 2 - 1;
+		int r = width - inset * 2 - 1;
 		int x = r;
 		int z = 0;
 		int xChange = 1 - 2 * r;
@@ -223,9 +222,9 @@ public class ByteChunk {
 	
 	public void setArcSouthEast(int inset, int y1, int y2, byte materialId, boolean fill) {
 		// Ref: Notes/BCircle.PDF
-		int cx = Width - inset;
-		int cz = Width - inset;
-		int r = Width - inset * 2 - 1;
+		int cx = width - inset;
+		int cz = width - inset;
+		int r = width - inset * 2 - 1;
 		int x = r;
 		int z = 0;
 		int xChange = 1 - 2 * r;
@@ -249,69 +248,6 @@ public class ByteChunk {
 				rError += xChange;
 				xChange += 2;
 			}
-		}
-	}
-	
-	//TODO Debug
-	public void drawCoordinate(int X, int Z, int blocky, boolean andNorth) {
-		drawNumber(X, 0, 3, blocky + 1);
-		drawNumber(Z, 0, 8, blocky + 1);
-		if (andNorth) {
-			drawNorth(0, 14, blocky + 1);
-		}
-	}
-	
-	//TODO Debug
-	private void drawNorth(int X, int Z, int blocky) {
-		byte id = (byte) Material.GLOWSTONE.getId();
-		this.setBlock(X + 4, blocky, Z - 2, id);
-		
-		this.setBlock(X + 3, blocky, Z - 1, id);
-		this.setBlock(X + 3, blocky, Z - 2, id);
-		this.setBlock(X + 3, blocky, Z - 3, id);
-		
-		this.setBlock(X + 2, blocky, Z    , id);
-		this.setBlock(X + 2, blocky, Z - 1, id);
-		this.setBlock(X + 2, blocky, Z - 2, id);
-		this.setBlock(X + 2, blocky, Z - 3, id);
-		this.setBlock(X + 2, blocky, Z - 4, id);
-
-		this.setBlock(X + 1, blocky, Z - 2, id);
-		this.setBlock(X    , blocky, Z - 2, id);
-	}
-	
-	//TODO Debug
-	private void drawNumber(int I, int X, int Z, int Y) {
-		drawPixel(I, X + 4, Z - 2, Y,    2, 3, 4, 5,    7, 8, 9, 0);
-		drawPixel(I, X + 4, Z - 1, Y,    2, 3,    5, 6, 7, 8, 9, 0);
-		drawPixel(I, X + 4, Z - 0, Y, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0);
-
-		drawPixel(I, X + 3, Z - 2, Y,          4, 5, 6,    8, 9, 0);
-		drawPixel(I, X + 3, Z - 0, Y, 1, 2, 3, 4,       7, 8, 9, 0);
-
-		drawPixel(I, X + 2, Z - 2, Y,    2, 3, 4, 5, 6,    8, 9, 0);
-		drawPixel(I, X + 2, Z - 1, Y,    2, 3, 4, 5, 6,    8, 9   );
-		drawPixel(I, X + 2, Z - 0, Y, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0);
-
-		drawPixel(I, X + 1, Z - 2, Y,    2,          6,    8,    0);
-		drawPixel(I, X + 1, Z - 0, Y, 1,    3, 4, 5, 6, 7, 8, 9, 0);
-
-		drawPixel(I, X + 0, Z - 2, Y,    2, 3,    5, 6,    8,    0);
-		drawPixel(I, X + 0, Z - 1, Y,    2, 3,    5, 6,    8,    0);
-		drawPixel(I, X + 0, Z - 0, Y, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0);
-	}
-	
-	//TODO Debug
-	private void drawPixel(int I, int X, int Z, int Y, int ... vals) {
-		boolean setit = false;
-		for (int v : vals) {
-			if (I == v) {
-				setit = true;
-				break;
-			}
-		}
-		if (setit) {
-			setBlock(X, Y, Z, (byte) Material.GLOWSTONE.getId());
 		}
 	}
 }

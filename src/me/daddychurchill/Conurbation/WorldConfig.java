@@ -3,8 +3,6 @@ package me.daddychurchill.Conurbation;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class WorldConfig {
-	private static FileConfiguration config;
-	
 	private Conurbation plugin;
 	private String worldname;
 	private String worldstyle;
@@ -38,26 +36,24 @@ public class WorldConfig {
 		boolean globalIncludeUrbanZones = defaultIncludeUrbanZones;
 		
 		// global read yet?
-		if (config == null) {
-			config = plugin.getConfig();
-			config.options().header("Conurbation Global Options");
-			config.addDefault("Global.StreetLevel", defaultStreetLevel);
-			config.addDefault("Global.SeabedLevel", defaultSeabedLevel);
-			config.addDefault("Global.DecrepitLevel", defaultDecrepitLevel);
-			config.addDefault("Global.IncludeAgricultureZones", defaultIncludeAgricultureZones);
-			config.addDefault("Global.IncludeResidentialZones", defaultIncludeResidentialZones);
-			config.addDefault("Global.IncludeUrbanZones", defaultIncludeUrbanZones);
-			config.options().copyDefaults(true);
-			plugin.saveConfig();
-			
-			// now read out the bits for real
-			globalStreetLevel = config.getInt("Global.StreetLevel");
-			globalSeabedLevel = config.getInt("Global.SeabedLevel");
-			globalDecrepitLevel = config.getDouble("Global.DecrepitLevel");
-			globalIncludeAgricultureZones = config.getBoolean("Global.IncludeAgricultureZones");
-			globalIncludeResidentialZones = config.getBoolean("Global.IncludeResidentialZones");
-			globalIncludeUrbanZones = config.getBoolean("Global.IncludeUrbanZones");
-		}
+		FileConfiguration config = plugin.getConfig();
+		config.options().header("Conurbation Global Options");
+		config.addDefault("Global.StreetLevel", defaultStreetLevel);
+		config.addDefault("Global.SeabedLevel", defaultSeabedLevel);
+		config.addDefault("Global.DecrepitLevel", defaultDecrepitLevel);
+		config.addDefault("Global.IncludeAgricultureZones", defaultIncludeAgricultureZones);
+		config.addDefault("Global.IncludeResidentialZones", defaultIncludeResidentialZones);
+		config.addDefault("Global.IncludeUrbanZones", defaultIncludeUrbanZones);
+		config.options().copyDefaults(true);
+		plugin.saveConfig();
+		
+		// now read out the bits for real
+		globalStreetLevel = config.getInt("Global.StreetLevel");
+		globalSeabedLevel = config.getInt("Global.SeabedLevel");
+		globalDecrepitLevel = config.getDouble("Global.DecrepitLevel");
+		globalIncludeAgricultureZones = config.getBoolean("Global.IncludeAgricultureZones");
+		globalIncludeResidentialZones = config.getBoolean("Global.IncludeResidentialZones");
+		globalIncludeUrbanZones = config.getBoolean("Global.IncludeUrbanZones");
 		
 //		// copy over the defaults
 //		streetLevel = globalStreetLevel;

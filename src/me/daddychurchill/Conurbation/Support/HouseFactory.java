@@ -83,8 +83,8 @@ public class HouseFactory {
 		}
 		
 		// where is the center of the house?
-		int roomOffsetX = chunk.Width / 2 + random.nextInt(2) - 1;
-		int roomOffsetZ = chunk.Width / 2 + random.nextInt(2) - 1;
+		int roomOffsetX = chunk.width / 2 + random.nextInt(2) - 1;
+		int roomOffsetZ = chunk.width / 2 + random.nextInt(2) - 1;
 		
 		// draw the individual rooms
 		for (int f = 0; f < floors; f++) {
@@ -98,8 +98,8 @@ public class HouseFactory {
 		// extrude roof
 		int roofY = baseY + floors * Generator.floorHeight - 1;
 		for (int y = 0; y < Generator.floorHeight - 1; y++) {
-			for (int x = 1; x < chunk.Width - 1; x++) {
-				for (int z = 1; z < chunk.Width - 1; z++) {
+			for (int x = 1; x < chunk.width - 1; x++) {
+				for (int z = 1; z < chunk.width - 1; z++) {
 					int yAt = y + roofY;
 					if (chunk.getBlock(x - 1, yAt, z) != byteAir && chunk.getBlock(x + 1, yAt, z) != byteAir &&
 						chunk.getBlock(x, yAt, z - 1) != byteAir && chunk.getBlock(x, yAt, z + 1) != byteAir) {
@@ -111,8 +111,8 @@ public class HouseFactory {
 		
 		// carve out the attic
 		for (int y = 1; y < Generator.floorHeight - 1; y++) {
-			for (int x = 1; x < chunk.Width - 1; x++) {
-				for (int z = 1; z < chunk.Width - 1; z++) {
+			for (int x = 1; x < chunk.width - 1; x++) {
+				for (int z = 1; z < chunk.width - 1; z++) {
 					int yAt = y + roofY;
 					if (chunk.getBlock(x, yAt + 1, z) != byteAir) {
 						chunk.setBlock(x, yAt, z, byteAir);

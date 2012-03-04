@@ -58,19 +58,19 @@ public class CityGenerator extends PlatGenerator {
 			// do the walls... maybe
 			if (insetNorth > 0) {
 				//wallMaterial = (byte) Material.BOOKSHELF.getId();
-				generateNSWall(chunk, random, insetWest, chunk.Width - insetEast, y1, y2, insetNorth, insetNorth + 1, neighbors.wallMaterial, glassSkip);
+				generateNSWall(chunk, random, insetWest, chunk.width - insetEast, y1, y2, insetNorth, insetNorth + 1, neighbors.wallMaterial, glassSkip);
 			}
 			if (insetSouth > 0) {
 				//wallMaterial = (byte) Material.GOLD_BLOCK.getId();
-				generateNSWall(chunk, random, insetWest, chunk.Width - insetEast, y1, y2, chunk.Width - insetSouth - 1, chunk.Width - insetSouth, neighbors.wallMaterial, glassSkip);
+				generateNSWall(chunk, random, insetWest, chunk.width - insetEast, y1, y2, chunk.width - insetSouth - 1, chunk.width - insetSouth, neighbors.wallMaterial, glassSkip);
 			}
 			if (insetWest > 0) {
 				//wallMaterial = (byte) Material.LAPIS_BLOCK.getId();
-				generateEWWall(chunk, random, insetWest, insetWest + 1, y1, y2, insetNorth, chunk.Width - insetSouth, neighbors.wallMaterial, glassSkip);
+				generateEWWall(chunk, random, insetWest, insetWest + 1, y1, y2, insetNorth, chunk.width - insetSouth, neighbors.wallMaterial, glassSkip);
 			}
 			if (insetEast > 0) {
 				//wallMaterial = (byte) Material.IRON_BLOCK.getId();
-				generateEWWall(chunk, random, chunk.Width - insetEast - 1, chunk.Width - insetEast, y1, y2, insetNorth, chunk.Width - insetSouth, neighbors.wallMaterial, glassSkip);
+				generateEWWall(chunk, random, chunk.width - insetEast - 1, chunk.width - insetEast, y1, y2, insetNorth, chunk.width - insetSouth, neighbors.wallMaterial, glassSkip);
 			}
 			
 			// top it off
@@ -88,30 +88,30 @@ public class CityGenerator extends PlatGenerator {
 		int y2 = y1 + 1;
 		
 		// center part
-		chunk.setBlocks(insetWest, chunk.Width - insetEast, y1, y2, insetNorth, chunk.Width - insetSouth, material);
+		chunk.setBlocks(insetWest, chunk.width - insetEast, y1, y2, insetNorth, chunk.width - insetSouth, material);
 		
 		// now the outer bits
 		if (insetNorth > 0 || insetSouth > 0 || insetWest > 0 || insetEast > 0) {
 			
 			// cardinal bits
 			if (neighbors.toNorth())
-				chunk.setBlocks(insetEast, chunk.Width - insetWest, y1, y2, 0, insetNorth, material);
+				chunk.setBlocks(insetEast, chunk.width - insetWest, y1, y2, 0, insetNorth, material);
 			if (neighbors.toSouth())
-				chunk.setBlocks(insetEast, chunk.Width - insetWest, y1, y2, chunk.Width - insetSouth, chunk.Width, material);
+				chunk.setBlocks(insetEast, chunk.width - insetWest, y1, y2, chunk.width - insetSouth, chunk.width, material);
 			if (neighbors.toWest())
-				chunk.setBlocks(0, insetWest, y1, y2, insetNorth, chunk.Width - insetSouth, material);
+				chunk.setBlocks(0, insetWest, y1, y2, insetNorth, chunk.width - insetSouth, material);
 			if (neighbors.toEast())
-				chunk.setBlocks(chunk.Width - insetEast, chunk.Width, y1, y2, insetNorth, chunk.Width - insetSouth, material);
+				chunk.setBlocks(chunk.width - insetEast, chunk.width, y1, y2, insetNorth, chunk.width - insetSouth, material);
 		
 			// corner bits
 			if (neighbors.toNorthWest())
 				chunk.setBlocks(0, insetWest, y1, y2, 0, insetNorth, material);
 			if (neighbors.toNorthEast())
-				chunk.setBlocks(chunk.Width - insetEast, chunk.Width, y1, y2, 0, insetNorth, material);
+				chunk.setBlocks(chunk.width - insetEast, chunk.width, y1, y2, 0, insetNorth, material);
 			if (neighbors.toSouthWest())
-				chunk.setBlocks(0, insetWest, y1, y2, chunk.Width - insetSouth, chunk.Width, material);
+				chunk.setBlocks(0, insetWest, y1, y2, chunk.width - insetSouth, chunk.width, material);
 			if (neighbors.toSouthEast())
-				chunk.setBlocks(chunk.Width - insetEast, chunk.Width, y1, y2, chunk.Width - insetSouth, chunk.Width, material);
+				chunk.setBlocks(chunk.width - insetEast, chunk.width, y1, y2, chunk.width - insetSouth, chunk.width, material);
 		}
 	}
 	

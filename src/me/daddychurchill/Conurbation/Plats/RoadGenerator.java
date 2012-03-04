@@ -70,32 +70,32 @@ public class RoadGenerator extends PlatGenerator {
 		
 		// sidewalk corners
 		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
-		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, chunk.Width - sidewalkWidth, chunk.Width, byteSidewalk);
-		chunk.setBlocks(chunk.Width - sidewalkWidth, chunk.Width, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
-		chunk.setBlocks(chunk.Width - sidewalkWidth, chunk.Width, sidewalkLevel, sidewalkLevel + 1, chunk.Width - sidewalkWidth, chunk.Width, byteSidewalk);
+		chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, chunk.width - sidewalkWidth, chunk.width, byteSidewalk);
+		chunk.setBlocks(chunk.width - sidewalkWidth, chunk.width, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
+		chunk.setBlocks(chunk.width - sidewalkWidth, chunk.width, sidewalkLevel, sidewalkLevel + 1, chunk.width - sidewalkWidth, chunk.width, byteSidewalk);
 		
 		// sidewalk edges
 		if (!toWest)
-			chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, chunk.Width - sidewalkWidth, byteSidewalk);
+			chunk.setBlocks(0, sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, chunk.width - sidewalkWidth, byteSidewalk);
 		if (!toEast)
-			chunk.setBlocks(chunk.Width - sidewalkWidth, chunk.Width, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, chunk.Width - sidewalkWidth, byteSidewalk);
+			chunk.setBlocks(chunk.width - sidewalkWidth, chunk.width, sidewalkLevel, sidewalkLevel + 1, sidewalkWidth, chunk.width - sidewalkWidth, byteSidewalk);
 		if (!toNorth)
-			chunk.setBlocks(sidewalkWidth, chunk.Width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
+			chunk.setBlocks(sidewalkWidth, chunk.width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, 0, sidewalkWidth, byteSidewalk);
 		if (!toSouth)
-			chunk.setBlocks(sidewalkWidth, chunk.Width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, chunk.Width - sidewalkWidth, chunk.Width, byteSidewalk);
+			chunk.setBlocks(sidewalkWidth, chunk.width - sidewalkWidth, sidewalkLevel, sidewalkLevel + 1, chunk.width - sidewalkWidth, chunk.width, byteSidewalk);
 		
 		// round things out
 		if (!toWest && toEast && !toNorth && toSouth)
 			generateRoundedOut(chunk, sidewalkLevel, sidewalkWidth, sidewalkWidth, 
 					false, false);
 		if (!toWest && toEast && toNorth && !toSouth)
-			generateRoundedOut(chunk, sidewalkLevel, sidewalkWidth, chunk.Width - sidewalkWidth - 4, 
+			generateRoundedOut(chunk, sidewalkLevel, sidewalkWidth, chunk.width - sidewalkWidth - 4, 
 					false, true);
 		if (toWest && !toEast && !toNorth && toSouth)
-			generateRoundedOut(chunk, sidewalkLevel, chunk.Width - sidewalkWidth - 4, sidewalkWidth, 
+			generateRoundedOut(chunk, sidewalkLevel, chunk.width - sidewalkWidth - 4, sidewalkWidth, 
 					true, false);
 		if (toWest && !toEast && toNorth && !toSouth)
-			generateRoundedOut(chunk, sidewalkLevel, chunk.Width - sidewalkWidth - 4, chunk.Width - sidewalkWidth - 4, 
+			generateRoundedOut(chunk, sidewalkLevel, chunk.width - sidewalkWidth - 4, chunk.width - sidewalkWidth - 4, 
 					true, true);
 		
 		//TODO need to create more complex bridge styles
@@ -160,7 +160,7 @@ public class RoadGenerator extends PlatGenerator {
 		// light posts
 		boolean isTorch = noise.isRural(chunkX, chunkZ);
 		generateLightPost(chunk, random, sidewalkWidth - 1, sidewalkWidth - 1, isTorch);
-		generateLightPost(chunk, random, chunk.Width - sidewalkWidth, chunk.Width - sidewalkWidth, isTorch);
+		generateLightPost(chunk, random, chunk.width - sidewalkWidth, chunk.width - sidewalkWidth, isTorch);
 		
 		// tell users where they are
 		generateStreetSigns(chunk, random, sidewalkWidth - 1, sidewalkWidth - 1, fixRoadCoordinate(chunkX), fixRoadCoordinate(chunkZ));
