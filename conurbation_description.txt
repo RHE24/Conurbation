@@ -5,7 +5,7 @@ Now the code base has diverged enough that I am not sure the two project will ev
 This might be for the best as some folks want a world full of city and others want more regional variety. 
 Only time will tell if the two project will merge again… hard to tell.
 
-===== //Version 0.04// ===== 
+===== //Version 0.05// ===== 
 ,,//(sometimes there is a delay in getting the new version of the plugin through the approval process, if the above version isn't available check back in an hour or so)//,,
  
 === Alpha ===
@@ -15,6 +15,7 @@ I am looking for feedback on the new generator, the forums have got some "prepop
 Feel free to add your comments to them or add a new thread, thanks.
 
 ==== Technical info ====
+* v0.05 1.2.3 R0 Happy, since Bukkit doesn't support taller generated heights yet we are still stuck at 127, sorry
 * v0.04 Made 1.1 R6 Happy
 * v0.03 Added config.yml options to control if farms, residential or urban areas are generated. If that area is not generated a sculpted forest will be generated instead.
 * v0.02 Initial release

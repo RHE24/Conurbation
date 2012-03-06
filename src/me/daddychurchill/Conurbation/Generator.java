@@ -76,7 +76,7 @@ public class Generator {
 		noiseUrbanization = new SimplexNoiseGenerator(getNextSeed());
 		noiseGreenBelt = new SimplexNoiseGenerator(getNextSeed());
 		
-		maximumLevel = world.getMaxHeight();
+		maximumLevel = 127;//world.getMaxHeight() - 1;
 		streetLevel = this.config.getStreetLevel();
 		seabedLevel = this.config.getSeabedLevel();
 		decrepitLevel = this.config.getDecrepitLevel();
