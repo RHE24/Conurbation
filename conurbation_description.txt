@@ -11,7 +11,7 @@ Be patient and play more Minecraft :-)
 
 {{http://dev.bukkit.org/media/images/39/64/2012-02-27_22.41.03.jpg|stuff}}
 
-===== //Version 0.05// ===== 
+===== //Version 0.06// ===== 
 ,,//(sometimes there is a delay in getting the new version of the plugin through the approval process, if the above version isn't available check back in an hour or so)//,,
  
 === Beta ===
@@ -21,8 +21,9 @@ I am looking for feedback on the new generator, the forums have got some "prepop
 Feel free to add your comments to them or add a new thread, thanks.
 
 ==== Technical info ====
+* v0.06 1.2.3-R0.2 Happy and Fixed a few string and permission issues
 * v0.05 1.2.3 R0 Happy, since Bukkit doesn't support taller generated heights yet we are still stuck at 127, sorry
-* v0.04 Made 1.1 R6 Happy
+* v0.04 1.1 R6 Happy
 * v0.03 Added config.yml options to control if farms, residential or urban areas are generated. If that area is not generated a sculpted forest will be generated instead.
 * v0.02 Initial release
 

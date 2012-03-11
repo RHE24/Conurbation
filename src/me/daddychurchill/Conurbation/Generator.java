@@ -68,28 +68,30 @@ public class Generator {
 	public final static int floorHeight = 4;
 	public final static int floorsReserved = 2;
 	
-	public Generator(World world, WorldConfig config) {
+	public Generator(World aWorld, WorldConfig aConfig) {
 		super();
-		this.world = world;
-		this.config = config;
+		world = aWorld;
+		config = aConfig;
 		
 		noiseUrbanization = new SimplexNoiseGenerator(getNextSeed());
 		noiseGreenBelt = new SimplexNoiseGenerator(getNextSeed());
 		
-		maximumLevel = 127;//world.getMaxHeight() - 1;
-		streetLevel = this.config.getStreetLevel();
-		seabedLevel = this.config.getSeabedLevel();
-		decrepitLevel = this.config.getDecrepitLevel();
-		includeAgricultureZones = this.config.getIncludeAgricultureZones();
-		includeResidentialZones = this.config.getIncludeResidentialZones();
-		includeUrbanZones = this.config.getIncludeUrbanZones();
+		streetLevel = config.getStreetLevel();
+		seabedLevel = config.getSeabedLevel();
+		decrepitLevel = config.getDecrepitLevel();
+		includeAgricultureZones = config.getIncludeAgricultureZones();
+		includeResidentialZones = config.getIncludeResidentialZones();
+		includeUrbanZones = config.getIncludeUrbanZones();
 		
+		maximumLevel = aWorld.getMaxHeight() - 1;
 		if (streetLevel < 0)
-			streetLevel = world.getSeaLevel() + WaterGenerator.shoreHeight;
+			streetLevel = aWorld.getSeaLevel() + WaterGenerator.shoreHeight;
 		if (seabedLevel < 0)
 			seabedLevel = streetLevel / 2;
+		
 		streetLevel = rangeCheck(streetLevel, maximumLevel);
 		seabedLevel = rangeCheck(seabedLevel, streetLevel);
+		maximumLevel = Math.min(maximumLevel, (config.getMaximumFloors() + floorsReserved) * floorHeight + streetLevel);
 		maximumFloors = (maximumLevel - streetLevel) / floorHeight - floorsReserved;
 				
 		generatorLake = new LakeGenerator(this);
