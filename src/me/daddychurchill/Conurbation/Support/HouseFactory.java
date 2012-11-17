@@ -9,6 +9,7 @@ import org.bukkit.Material;
 public class HouseFactory {
 
 	protected static byte byteAir = (byte) Material.AIR.getId();
+	protected static byte byteLight = (byte) Material.GLOWSTONE.getId();
 	protected static byte byteGlass = (byte) Material.THIN_GLASS.getId();
 	
 	// the description of a single room
@@ -110,16 +111,16 @@ public class HouseFactory {
 		}
 		
 		// carve out the attic
-		for (int y = 1; y < Generator.floorHeight - 1; y++) {
-			for (int x = 1; x < chunk.width - 1; x++) {
-				for (int z = 1; z < chunk.width - 1; z++) {
-					int yAt = y + roofY;
-					if (chunk.getBlock(x, yAt + 1, z) != byteAir) {
-						chunk.setBlock(x, yAt, z, byteAir);
-					}
-				}
-			}
-		}
+//		for (int y = 1; y < Generator.floorHeight - 1; y++) {
+//			for (int x = 1; x < chunk.width - 1; x++) {
+//				for (int z = 1; z < chunk.width - 1; z++) {
+//					int yAt = y + roofY;
+//					if (chunk.getBlock(x, yAt + 1, z) != byteAir) {
+//						chunk.setBlock(x, yAt, z, byteAir);
+//					}
+//				}
+//			}
+//		}
 	}
 	
 	protected static void drawRoom(ByteChunk chunk, Room[][][] rooms, int floor, boolean topFloor, int x, int z, 

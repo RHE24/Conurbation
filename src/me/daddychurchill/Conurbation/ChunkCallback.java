@@ -42,7 +42,7 @@ public class ChunkCallback extends ChunkGenerator {
 	}
 	
 	@Override
-	public byte[] generate(World world, Random random, int chunkX, int chunkZ) {
+	public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes) {
 		
 		// who makes what?
 		if (generators == null)
